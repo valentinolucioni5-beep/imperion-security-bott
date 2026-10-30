@@ -1,0 +1,164 @@
+{
+  "config": {
+    "empleadosRoleId": "1564762865246675074",
+    "rrhhRoleId": "1565722607532253194",
+    "autoRoleApproveId": "1563510109513195550",
+    "giveEmpleadosRoleOnApprove": true,
+    "enServicioRoleId": "1564763063197110372",
+    "clockChannelId": "1564772465819787314",
+    "actividadesChannelId": "1564773893883822100",
+    "bonosChannelId": "1564772178371547216",
+    "reunionesChannelId": "1563511968541970513",
+    "anunciosChannelId": "1563511678254190602",
+    "uniformeChannelId": "1564772258646589641",
+    "soporteChannelId": "1347868773914247179",
+    "ticketsCategoryId": "1563499611665072240",
+    "logAprobadasChannelId": "1565718380835635384",
+    "logRechazadasChannelId": "1565718383188779118",
+    "counterEmpleadosChannelId": "1565707074053210175",
+    "counterServicioChannelId": "1565707076888428675",
+    "maxDutyHours": 5,
+    "masterSecurityCode": "IMP-2026"
+  },
+  "rates": {
+    "hour": 1500,
+    "atm": 3500,
+    "alarm": 3200,
+    "cam": 3000,
+    "escort": 6000,
+    "rev": 4000
+  },
+  "employees": [
+    {
+      "id": "1522039622321049753",
+      "discordId": "1522039622321049753",
+      "name": "Felaniel",
+      "discord": "@felanielfelini",
+      "rank": "🛡️・Agente de Seguridad",
+      "roleId": "1563510109513195550",
+      "onDuty": false,
+      "dutyStart": null,
+      "hours": 0,
+      "totalHours": 0,
+      "atm": 0,
+      "alarm": 0,
+      "cam": 0,
+      "escort": 0,
+      "rev": 0,
+      "bonusExtra": 0,
+      "attendance": "Pendiente",
+      "reason": "",
+      "warnings": 0
+    },
+    {
+      "id": "846715984009887814",
+      "discordId": "846715984009887814",
+      "name": "Giovanni Dimon",
+      "discord": "@hatim.ecom",
+      "avatar": "https://cdn.discordapp.com/avatars/846715984009887814/f2081d5e6b69138a1082b0ff6ef80ff4.png?size=128",
+      "rank": "👑 CEO / Fundador",
+      "roleId": "1563508474820825138",
+      "specialRoles": [],
+      "notes": "Sincronizado con Discord",
+      "sanctionsHistory": [],
+      "onDuty": false,
+      "dutyStart": null,
+      "hours": 0,
+      "totalHours": 0,
+      "atm": 0,
+      "alarm": 0,
+      "cam": 0,
+      "escort": 0,
+      "rev": 0,
+      "bonusExtra": 0,
+      "attendance": "Confirmado",
+      "reason": "",
+      "warnings": 0
+    },
+    {
+      "id": "1324175993966956697",
+      "discordId": "1324175993966956697",
+      "name": ".btc",
+      "discord": "@jajajjajajajajajajajjaa",
+      "avatar": "https://cdn.discordapp.com/avatars/1324175993966956697/791aee9d0f22eb16579ea5b35967a22a.png?size=128",
+      "rank": "🎖️ Jefe de Seguridad",
+      "roleId": "1563509687897428018",
+      "specialRoles": [],
+      "notes": "Sincronizado con Discord",
+      "sanctionsHistory": [],
+      "onDuty": false,
+      "dutyStart": null,
+      "hours": 0,
+      "totalHours": 0,
+      "atm": 0,
+      "alarm": 0,
+      "cam": 0,
+      "escort": 0,
+      "rev": 0,
+      "bonusExtra": 0,
+      "attendance": "Confirmado",
+      "reason": "",
+      "warnings": 0
+    }
+  ],
+  "activitiesLog": [
+    {
+      "id": 1793363137591,
+      "emp": "En espera de certificación en Discord",
+      "type": "REPARACIÓN DE CÁMARAS #3",
+      "time": "Recién despachado",
+      "reward": "$3.000",
+      "status": "Activo"
+    }
+  ],
+  "feedEvents": [
+    {
+      "time": "10:58",
+      "tag": "LOGIN",
+      "text": "Valentino Homero (🧑‍💻 Dev) ingresó al Panel Web"
+    },
+    {
+      "time": "10:58",
+      "tag": "ACCESO",
+      "text": "Credencial Web activa para Valentino Homero (🧑‍💻 Dev)"
+    },
+    {
+      "time": "10:42",
+      "tag": "RRHH",
+      "text": "Rol oficial creado y configurado: 💼・Recursos Humanos (RRHH)"
+    },
+    {
+      "time": "10:30",
+      "tag": "COMUNICADO",
+      "text": "\"Pruena dashboard\" publicado en #📢┊ᴀɴᴜɴᴄɪᴏs"
+    },
+    {
+      "time": "10:25",
+      "tag": "LOGS",
+      "text": "Canales de logs activos: #✅┊ᴘᴏsᴛᴜʟᴀᴄɪᴏɴᴇs-ᴀᴘʀᴏʙᴀᴅᴀs y #❌┊ᴘᴏsᴛᴜʟᴀᴄɪᴏɴᴇs-ʀᴇᴄʜᴀᴢᴀᴅᴀs"
+    },
+    {
+      "time": "09:59",
+      "tag": "AUTO",
+      "text": "Despacho automático Orion: REABASTECER CAJEROS #4"
+    },
+    {
+      "time": "09:40",
+      "tag": "SISTEMA",
+      "text": "Canales contadores superiores (Empleados / En Servicio) creados"
+    }
+  ],
+  "applications": [],
+  "staffUsers": [
+    {
+      "id": "1793368716406",
+      "discordId": "1324175993966956697",
+      "discordTag": "@jajajjajajajajajajajjaa",
+      "icName": "Valentino Homero",
+      "roleTitle": "🧑‍💻 Dev",
+      "accessLevel": "Direccion",
+      "securityCode": "IMP-5560",
+      "createdAt": "30/10/2026"
+    }
+  ]
+}

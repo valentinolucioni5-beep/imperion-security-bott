@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMPERION SECURITY — Executive Command Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #06070a;
+      color: #f8fafc;
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 100%, rgba(212, 175, 55, 0.05) 0%, transparent 45%);
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #fde68a 0%, #eab308 50%, #ca8a04 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .gold-btn {
+      background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+      color: #090a0f;
+      box-shadow: 0 4px 20px -2px rgba(234, 179, 8, 0.35);
+    }
+    .gold-btn:hover {
+      background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+      box-shadow: 0 6px 25px -2px rgba(234, 179, 8, 0.5);
+    }
+    .glass-card {
+      background: rgba(15, 18, 26, 0.82);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+    .glass-card-gold {
+      background: linear-gradient(180deg, rgba(24, 22, 16, 0.92) 0%, rgba(11, 13, 20, 0.96) 100%);
+      border: 1px solid rgba(234, 179, 8, 0.28);
+      box-shadow: 0 15px 40px -10px rgba(234, 179, 8, 0.16);
+    }
+    .nav-active {
+      background: linear-gradient(90deg, rgba(234, 179, 8, 0.16) 0%, rgba(234, 179, 8, 0.02) 100%);
+      border-left: 3px solid #eab308;
+      color: #fef08a;
+    }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(234, 179, 8, 0.25); border-radius: 9999px; }
+  </style>
+</head>
+<body class="antialiased selection:bg-amber-500 selection:text-black">
+
+  <!-- ==================== PANTALLA DE LOGIN OFICIAL (NOMBRE IC + CÓDIGO DE SEGURIDAD) ==================== -->
+  <div id="login-overlay" class="fixed inset-0 z-50 bg-[#050609]/95 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="glass-card-gold rounded-3xl max-w-md w-full p-8 space-y-6 border border-amber-500/30 shadow-2xl relative overflow-hidden">
+      <div class="flex flex-col items-center text-center space-y-3">
+        <div class="relative">
+          <img src="/assets/logo.jpg" alt="IMPERION Security" class="w-24 h-24 rounded-2xl object-cover border-2 border-amber-500/50 shadow-2xl" />
+          <span class="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-500 text-black">ORION</span>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-wider gold-gradient-text">IMPERION SECURITY</h1>
+          <p class="text-xs text-slate-400 mt-0.5">TERMINAL DE ACCESO — CÚPULA, RRHH E INSTRUCTORES</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1.5">🪪 Nombre y Apellido IC (Dentro del Juego)</label>
+          <input id="login-ic-name" type="text" required placeholder="Ej: Valentino Santana" class="w-full px-4 py-3 rounded-xl bg-black/70 border border-white/15 text-white font-semibold focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1.5">🎖️ División / Cargo Operativo</label>
+          <select id="login-role-choice" class="w-full px-4 py-3 rounded-xl bg-black/70 border border-white/15 text-white font-semibold focus:outline-none focus:border-amber-500">
+            <option value="Direccion">👑 Dirección / Rango Alto</option>
+            <option value="RRHH">💼・Recursos Humanos (RRHH)</option>
+            <option value="Instructor">📘 Instructor / Evaluador</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1.5">🔐 Código de Seguridad / PIN de Acceso</label>
+          <input id="login-security-code" type="password" required placeholder="Ingresá tu código (Ej: IMP-2026)" class="w-full px-4 py-3 rounded-xl bg-black/70 border border-amber-500/30 text-amber-300 font-mono font-bold tracking-widest focus:outline-none focus:border-amber-400" />
+        </div>
+
+        <div id="login-error" class="hidden p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 font-semibold text-center"></div>
+
+        <button type="submit" class="gold-btn w-full py-3.5 rounded-xl font-extrabold text-sm tracking-wide transition">
+          🔓 INGRESAR AL PANEL DE CONTROL
+        </button>
+      </form>
+
+      <div class="pt-3 border-t border-white/10 text-center space-y-1.5">
+        <p class="text-xs text-slate-400">
+          💡 ¿Sos <strong class="text-emerald-400">RRHH</strong>, <strong class="text-amber-300">Instructor</strong> o <strong class="text-amber-400">Rango Alto</strong>?
+        </p>
+        <p class="text-xs text-slate-500">
+          Podés obtener tu propio código en Discord usando el comando <code class="text-amber-300 font-mono">/mi-acceso</code> o solicitarlo a Dirección General.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex min-h-screen">
+
+    <!-- ==================== SIDEBAR IMPERION SECURITY ==================== -->
+    <aside class="w-72 bg-[#090b10] border-r border-white/10 flex flex-col justify-between shrink-0 select-none z-30">
+      <div>
+        <!-- Brand Logo Showcase -->
+        <div class="p-5 border-b border-white/10 flex items-center gap-3.5">
+          <div class="relative shrink-0">
+            <img src="/assets/logo.jpg" alt="IMPERION Security" class="w-12 h-12 rounded-xl object-cover border border-amber-500/40 shadow-lg shadow-amber-500/10" />
+            <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#090b10]"></span>
+          </div>
+          <div class="overflow-hidden">
+            <div class="font-extrabold text-sm tracking-wider gold-gradient-text truncate">
+              IMPERION SECURITY
+            </div>
+            <p class="text-xs text-slate-400 tracking-wide truncate">PROTEGIENDO LO QUE IMPORTA</p>
+          </div>
+        </div>
+
+        <!-- Menú Principal -->
+        <div class="p-3.5 space-y-1">
+          <div class="px-3 py-2 text-xs font-bold uppercase tracking-widest text-slate-500">
+            Centro de Operaciones
+          </div>
+
+          <button onclick="switchTab('resumen')" id="nav-resumen" class="nav-item nav-active w-full flex items-center justify-between px-3.5 py-3 rounded-r-xl text-xs font-semibold transition">
+            <span class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
+              </svg>
+              Command Center (Vivo)
+            </span>
+            <span id="badge-on-duty" class="px-2 py-0.5 text-xs rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono">0</span>
+          </button>
+
+          <button onclick="switchTab('postulaciones')" id="nav-postulaciones" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-r-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
+            <span class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              Solicitudes & Autorol
+            </span>
+            <span id="badge-postulaciones" class="px-2 py-0.5 text-xs rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">0</span>
+          </button>
+
+          <button onclick="switchTab('empleados')" id="nav-empleados" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-r-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
+            <span class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path stroke-linecap="round" stroke-linejoin="round" d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/>
+              </svg>
+              Empleados & Roles
+            </span>
+            <span id="badge-total-emp" class="px-2 py-0.5 text-xs rounded-full bg-white/5 text-slate-300 font-mono">0</span>
+          </button>
+
+          <button onclick="switchTab('bonos')" id="nav-bonos" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-r-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
+            <span class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Operativos & Liquidación
+            </span>
+          </button>
+
+          <button onclick="switchTab('reuniones')" id="nav-reuniones" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-r-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
+            <span class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              Reuniones & Asistencia
+            </span>
+          </button>
+
+          <div class="pt-4 pb-2 px-3 text-xs font-bold uppercase tracking-widest text-slate-500">
+            Seguridad & Discord
+          </div>
+
+          <button onclick="switchTab('accesos')" id="nav-accesos" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-r-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
+            <span class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              Accesos, RRHH & Roles
+            </span>
+          </button>
+
+          <button onclick="switchTab('discord')" id="nav-discord" class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-r-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 transition">
+            <span class="flex items-center gap-3">
+              <svg class="w-4 h-4 text-amber-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              Comunicados & Cron 24h
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Telemetría Inferior -->
+      <div class="p-4 border-t border-white/10 space-y-3 bg-[#06070a]/60">
+        <div class="p-3.5 rounded-xl glass-card-gold space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-amber-200/90">Imperion Bot #4005</span>
+            <span class="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              ONLINE
+            </span>
+          </div>
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span>Rol RRHH</span>
+            <span class="font-mono text-emerald-400">Configurado</span>
+          </div>
+          <div class="text-xs text-slate-400 flex items-center justify-between">
+            <span>Anti-AFK Activo</span>
+            <span class="font-mono text-amber-400">Corte 5.0h</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== ÁREA PRINCIPAL ==================== -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+
+      <!-- Barra Superior Ejecutiva -->
+      <header class="min-h-[5rem] py-3 bg-[#090b10]/95 backdrop-blur-md border-b border-white/10 px-6 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-20">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <h1 id="page-title" class="text-base sm:text-lg font-extrabold tracking-tight text-white truncate">CENTRO DE MONITOREO TÁCTICO</h1>
+              <span class="hidden xl:inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30 whitespace-nowrap">
+                Servidor Orion • Sincronizado
+              </span>
+            </div>
+            <p id="page-subtitle" class="text-xs text-slate-400 mt-0.5 truncate">Supervisión en tiempo real para Rangos Altos, RRHH e Instructores</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+          <!-- Oficial Logueado -->
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs whitespace-nowrap">
+            <span class="text-amber-300 font-bold max-w-[220px] truncate" id="logged-user-badge">👤 Oficial IC</span>
+            <button onclick="logoutUser()" class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 font-semibold transition">
+              Salir
+            </button>
+          </div>
+
+          <!-- Reloj Digital Servidor -->
+          <div class="hidden 2xl:flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-mono whitespace-nowrap">
+            <span class="text-slate-400">HUB:</span>
+            <span id="live-clock" class="text-amber-400 font-bold">--:--:--</span>
+          </div>
+
+          <button onclick="openModal('modal-actividad')" class="px-3 py-2 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-white border border-white/15 transition flex items-center gap-1.5 whitespace-nowrap">
+            <span>🚨</span> Operativo
+          </button>
+
+          <button onclick="openModal('modal-contratar')" class="gold-btn px-3 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 whitespace-nowrap">
+            <span>+</span> Contratar
+          </button>
+        </div>
+      </header>
+
+      <!-- Contenido Dinámico -->
+      <main class="p-6 space-y-6 flex-1 overflow-y-auto custom-scroll">
+
+        <!-- ==================== PESTAÑA 1: COMMAND CENTER ==================== -->
+        <section id="tab-resumen" class="space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="lg:col-span-2 glass-card-gold rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden">
+              <div class="space-y-2 z-10">
+                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
+                  🛡️ Cúpula, RRHH & Instructores • Imperion Security
+                </div>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+                  Panel Ejecutivo de Control & Postulaciones
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+                  Los <strong class="text-amber-300">Rangos Altos</strong>, <strong class="text-emerald-400">Recursos Humanos (RRHH)</strong> e <strong class="text-blue-300">Instructores</strong> pueden evaluar solicitudes de ingreso, otorgar autoroles y despachar actividades. Cada acción queda firmada con tu Nombre IC en los canales de logs.
+                </p>
+                <div class="pt-2 flex flex-wrap gap-2.5">
+                  <button onclick="switchTab('postulaciones')" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition">
+                    Evaluar Solicitudes de Ingreso →
+                  </button>
+                  <button onclick="switchTab('accesos')" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition">
+                    Gestionar Accesos & RRHH →
+                  </button>
+                  <button onclick="reenviarPanelClock()" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition">
+                    Sincronizar Rol RRHH y Contadores
+                  </button>
+                </div>
+              </div>
+              <img src="/assets/logo.jpg" alt="Logo" class="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl object-cover border-2 border-amber-500/40 shadow-2xl shrink-0" />
+            </div>
+
+            <!-- Tarjeta Próxima Actividad Automática Orion -->
+            <div class="glass-card rounded-2xl p-5 flex flex-col justify-between border border-amber-500/20">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-400">⏳ Próximo Operativo Orion</span>
+                <span class="px-2 py-0.5 rounded text-xs font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Auto-Cron :59</span>
+              </div>
+              <div class="my-3">
+                <div id="next-activity-name" class="text-base font-extrabold text-white truncate">Calculando próximo ciclo...</div>
+                <div class="text-xs text-slate-400 mt-0.5">Canal: <span class="text-slate-200 font-mono">#actividades-disponibles</span></div>
+              </div>
+              <div class="p-3 rounded-xl bg-black/50 border border-white/10 flex items-center justify-between">
+                <span class="text-xs text-slate-400">Tiempo restante:</span>
+                <span id="next-activity-countdown" class="font-mono text-lg font-extrabold text-amber-400">--:--</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Tarjetas KPI -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="glass-card rounded-2xl p-5 border-t-2 border-t-amber-500/60">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Agentes en Nómina</span>
+                <span class="p-2 rounded-lg bg-amber-500/10 text-amber-400">👮</span>
+              </div>
+              <div class="mt-3 flex items-baseline justify-between">
+                <span id="kpi-empleados" class="text-3xl font-extrabold font-mono text-white">0</span>
+                <span class="text-xs text-emerald-400 font-semibold">Rol @Empleados</span>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 border-t-2 border-t-emerald-500/60">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">En Servicio (/clock)</span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+              </div>
+              <div class="mt-3 flex items-baseline justify-between">
+                <span id="kpi-en-servicio" class="text-3xl font-extrabold font-mono text-emerald-400">0</span>
+                <span class="text-xs text-slate-400">Rol En servicio</span>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 border-t-2 border-t-blue-500/60">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Horas Computadas</span>
+                <span class="p-2 rounded-lg bg-blue-500/10 text-blue-400">⏱️</span>
+              </div>
+              <div class="mt-3 flex items-baseline justify-between">
+                <span id="kpi-horas" class="text-3xl font-extrabold font-mono text-white">0h 00m</span>
+                <span class="text-xs text-blue-400 font-mono">Corte 5h máx</span>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 border-t-2 border-t-amber-400">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Liquidación Acumulada</span>
+                <span class="p-2 rounded-lg bg-amber-500/10 text-amber-400">💰</span>
+              </div>
+              <div class="mt-3 flex items-baseline justify-between">
+                <span id="kpi-bonos" class="text-3xl font-extrabold font-mono gold-gradient-text">$0</span>
+                <span class="text-xs text-amber-300/80">Horas + Bonos</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Turnos en Vivo + Feed de Auditoría -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 glass-card rounded-2xl flex flex-col">
+              <div class="p-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    Unidades Trabajando Actualmente (Módulo /clock)
+                  </h2>
+                  <p class="text-xs text-slate-400 mt-0.5">Monitoreo horario en vivo con protección Anti-AFK automática a las 5 horas</p>
+                </div>
+                <button onclick="switchTab('empleados')" class="text-xs font-bold text-amber-400 hover:underline">
+                  Ver Nómina Completa →
+                </button>
+              </div>
+              <div id="live-duty-list" class="p-5 space-y-3 flex-1"></div>
+            </div>
+
+            <div class="glass-card rounded-2xl flex flex-col">
+              <div class="p-5 border-b border-white/10 flex items-center justify-between">
+                <div>
+                  <h2 class="text-sm font-bold text-white">Telemetría Discord en Vivo</h2>
+                  <p class="text-xs text-slate-400 mt-0.5">Eventos registrados por el bot</p>
+                </div>
+                <span class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-amber-500/15 text-amber-400 border border-amber-500/30">LIVE</span>
+              </div>
+              <div id="discord-feed" class="p-5 space-y-2.5 overflow-y-auto max-h-80 custom-scroll"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PESTAÑA 2: EMPLEADOS, ROLES Y GESTIÓN DE PERSONAL ==================== -->
+        <section id="tab-empleados" class="hidden space-y-6">
+
+          <!-- Cabecera de Gestión de Empleados y Sincronización con Discord -->
+          <div class="glass-card-gold rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                👮 Gestión de Empleados, Roles de Discord, Sanciones y Despidos
+              </h2>
+              <p class="text-xs text-slate-300 mt-0.5">
+                Si modificás el rol de un empleado desde la tabla o desde su perfil, <strong class="text-amber-300">se cambia su rol en Discord en el acto</strong>. Si despedís o sancionás a alguien, el bot le envía el <strong class="text-rose-300">motivo por MD privado</strong> y lo publica en <code class="text-amber-300 font-mono">#🛫┊ᴅᴇsᴘᴇᴅɪᴅᴏ</code>.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5 text-xs">
+              <button onclick="sincronizarEmpleadosDiscord()" class="px-3.5 py-2.5 rounded-xl font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition">
+                🔄 Sincronizar Empleados de Discord
+              </button>
+              <button onclick="openModal('modal-contratar')" class="gold-btn px-3.5 py-2.5 rounded-xl font-extrabold transition">
+                + Contratar / Alta Manual
+              </button>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl overflow-hidden">
+            <div class="p-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex flex-wrap items-center gap-3">
+                <input id="search-empleado" oninput="renderEmployees()" type="text" placeholder="Buscar empleado por Nombre IC, @Discord o rol..." class="w-80 px-3.5 py-2 text-xs rounded-xl bg-black/50 border border-white/15 text-white focus:outline-none focus:border-amber-500" />
+                <select id="filter-status" onchange="renderEmployees()" class="px-3.5 py-2 text-xs rounded-xl bg-black/50 border border-white/15 text-white">
+                  <option value="all">Todos los empleados</option>
+                  <option value="duty">🟢 En Servicio (/clock)</option>
+                  <option value="off">⚪ Fuera de Servicio</option>
+                </select>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <button onclick="resetWeekHours()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25 transition">
+                  🔄 Reiniciar Horas Semanales
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-white/10 bg-black/40 text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <th class="py-3.5 px-4">Empleado IC / Discord</th>
+                    <th class="py-3.5 px-4">Rol en Discord (Cambio en Vivo)</th>
+                    <th class="py-3.5 px-4">Estado / Sanciones</th>
+                    <th class="py-3.5 px-4">Cumplimiento (12h)</th>
+                    <th class="py-3.5 px-4">Operativos</th>
+                    <th class="py-3.5 px-4">Liquidación</th>
+                    <th class="py-3.5 px-4 text-right">Gestión de Perfil & Baja</th>
+                  </tr>
+                </thead>
+                <tbody id="employees-table-body" class="divide-y divide-white/5 text-xs"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PESTAÑA 3: POSTULACIONES, AUTOROL Y LOGS ==================== -->
+        <section id="tab-postulaciones" class="hidden space-y-6">
+
+          <!-- Panel de Configuración de Autorol y Canales de Logs -->
+          <div class="glass-card-gold rounded-2xl p-6 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+              <div>
+                <h2 class="text-sm font-extrabold text-white flex items-center gap-2">
+                  🎖️ Configuración de Autorol al Aprobar (Habilitado para Rangos Altos, RRHH e Instructores)
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  Elegí qué rol del servidor se asigna por defecto cuando aprobás una postulación (también podés cambiar el rol en cada solicitud antes de aprobar).
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 text-xs">
+                <span class="px-3 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono">
+                  ✅ Log: #✅┊ᴘᴏsᴛᴜʟᴀᴄɪᴏɴᴇs-ᴀᴘʀᴏʙᴀᴅᴀs
+                </span>
+                <span class="px-3 py-1 rounded-lg bg-rose-500/15 text-rose-400 border border-rose-500/30 font-mono">
+                  ❌ Log: #❌┊ᴘᴏsᴛᴜʟᴀᴄɪᴏɴᴇs-ʀᴇᴄʜᴀᴢᴀᴅᴀs
+                </span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end text-xs">
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1.5">Rol Principal (Autorol por defecto al aprobar):</label>
+                <select id="config-autorole-select" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-amber-500/30 text-white font-semibold"></select>
+              </div>
+
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1.5">Rol Adicional de Plantilla:</label>
+                <label class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 cursor-pointer">
+                  <input id="config-give-empleados" type="checkbox" checked class="accent-amber-500 w-4 h-4" />
+                  <span class="text-white font-medium">Dar también rol <strong class="text-amber-400">@Empleados</strong> automáticamente</span>
+                </label>
+              </div>
+
+              <div>
+                <button onclick="guardarConfigAutorol()" class="gold-btn w-full py-2.5 px-4 rounded-xl font-extrabold transition">
+                  💾 Guardar Autorol Predeterminado
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Solicitudes Pendientes -->
+          <div class="glass-card rounded-2xl p-6 space-y-5">
+            <div class="border-b border-white/10 pb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="text-base font-extrabold text-white">Solicitudes de Postulación Pendientes</h2>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  Al aprobar o rechazar, el log en Discord quedará firmado con tu identidad activa: <strong id="active-reviewer-preview" class="text-amber-300">Oficial IC</strong>.
+                </p>
+              </div>
+            </div>
+            <div id="applications-container" class="space-y-4"></div>
+          </div>
+
+          <!-- Historial de Postulaciones Evaluadas -->
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <div class="border-b border-white/10 pb-3">
+              <h2 class="text-sm font-bold text-white">Historial de Postulaciones Evaluadas (Aprobadas y Rechazadas)</h2>
+              <p class="text-xs text-slate-400">Registro sincronizado con los canales de logs de Discord</p>
+            </div>
+            <div id="applications-history" class="space-y-2.5 text-xs"></div>
+          </div>
+        </section>
+
+        <!-- ==================== PESTAÑA 4: OPERATIVOS Y BONOS ==================== -->
+        <section id="tab-bonos" class="hidden space-y-6">
+          <div class="glass-card rounded-2xl p-5 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 class="text-sm font-bold text-white">Catálogo Oficial de Operativos — IMPERION Security</h2>
+                <p class="text-xs text-slate-400">Imágenes HD cargadas en el bot para el envío automático en #actividades-disponibles</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div class="rounded-xl overflow-hidden bg-black/50 border border-white/10 flex flex-col justify-between">
+                <img src="/assets/activities/atm.jpg" class="w-full h-28 object-cover" alt="Cajeros" />
+                <div class="p-3 space-y-2">
+                  <div class="text-xs font-bold text-white">Reabastecer Cajeros</div>
+                  <button onclick="despacharRapido('atm', 'REABASTECER CAJEROS #4')" class="w-full py-1.5 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition">Enviar a Discord</button>
+                </div>
+              </div>
+
+              <div class="rounded-xl overflow-hidden bg-black/50 border border-white/10 flex flex-col justify-between">
+                <img src="/assets/activities/alarm.jpg" class="w-full h-28 object-cover" alt="Alarmas" />
+                <div class="p-3 space-y-2">
+                  <div class="text-xs font-bold text-white">Instalación de Alarmas</div>
+                  <button onclick="despacharRapido('alarm', 'INSTALACIÓN DE ALARMAS #1')" class="w-full py-1.5 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition">Enviar a Discord</button>
+                </div>
+              </div>
+
+              <div class="rounded-xl overflow-hidden bg-black/50 border border-white/10 flex flex-col justify-between">
+                <img src="/assets/activities/cam.jpg" class="w-full h-28 object-cover" alt="Cámaras" />
+                <div class="p-3 space-y-2">
+                  <div class="text-xs font-bold text-white">Reparación de Cámaras</div>
+                  <button onclick="despacharRapido('cam', 'REPARACIÓN DE CÁMARAS #3')" class="w-full py-1.5 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition">Enviar a Discord</button>
+                </div>
+              </div>
+
+              <div class="rounded-xl overflow-hidden bg-black/50 border border-white/10 flex flex-col justify-between">
+                <img src="/assets/activities/escort.jpg" class="w-full h-28 object-cover" alt="Escolta" />
+                <div class="p-3 space-y-2">
+                  <div class="text-xs font-bold text-white">Servicio de Escolta</div>
+                  <button onclick="despacharRapido('escort', 'SERVICIO DE ESCOLTA #3')" class="w-full py-1.5 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition">Enviar a Discord</button>
+                </div>
+              </div>
+
+              <div class="rounded-xl overflow-hidden bg-black/50 border border-white/10 flex flex-col justify-between">
+                <img src="/assets/activities/rev.jpg" class="w-full h-28 object-cover" alt="Revisión" />
+                <div class="p-3 space-y-2">
+                  <div class="text-xs font-bold text-white">Revisión de Seguridad</div>
+                  <button onclick="despacharRapido('rev', 'REVISIÓN DE SEGURIDAD #1')" class="w-full py-1.5 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30 transition">Enviar a Discord</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl p-5 space-y-4">
+              <div class="border-b border-white/10 pb-3">
+                <h2 class="text-sm font-bold text-white">Tarifario de Comisiones y Horas ($)</h2>
+                <p class="text-xs text-slate-400">Calcula automáticamente la liquidación de cada agente</p>
+              </div>
+
+              <div class="space-y-3 text-xs">
+                <div>
+                  <label class="block mb-1 text-slate-400">Pago por Hora de Servicio (/clock)</label>
+                  <input id="rate-hour" type="number" value="1500" onchange="saveRates()" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block mb-1 text-slate-400">Reabastecer Cajeros (#1 a #6)</label>
+                  <input id="rate-atm" type="number" value="3500" onchange="saveRates()" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block mb-1 text-slate-400">Instalación de Alarmas (#1 a #5)</label>
+                  <input id="rate-alarm" type="number" value="3200" onchange="saveRates()" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block mb-1 text-slate-400">Reparación de Cámaras (#1 a #4)</label>
+                  <input id="rate-cam" type="number" value="3000" onchange="saveRates()" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block mb-1 text-slate-400">Servicio de Escolta (#1 a #4)</label>
+                  <input id="rate-escort" type="number" value="6000" onchange="saveRates()" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block mb-1 text-slate-400">Revisión de Seguridad (#1 a #2)</label>
+                  <input id="rate-rev" type="number" value="4000" onchange="saveRates()" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white font-mono" />
+                </div>
+              </div>
+
+              <button onclick="liquidarSemana()" class="gold-btn w-full py-3 rounded-xl text-xs font-extrabold transition">
+                💵 Liquidar Semana y Publicar en #🎊┊ʙᴏɴᴏꜱ
+              </button>
+            </div>
+
+            <div class="lg:col-span-2 glass-card rounded-2xl flex flex-col">
+              <div class="p-5 border-b border-white/10">
+                <h2 class="text-sm font-bold text-white">Historial de Operativos Certificados</h2>
+                <p class="text-xs text-slate-400">Registro en vivo cuando los empleados presionan "Certificar Actividad Realizada" en Discord</p>
+              </div>
+              <div id="activities-log" class="p-5 space-y-3 flex-1"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PESTAÑA 5: REUNIONES Y ASISTENCIA ==================== -->
+        <section id="tab-reuniones" class="hidden space-y-6">
+          <div class="glass-card-gold rounded-2xl p-6 space-y-4">
+            <div class="border-b border-white/10 pb-3">
+              <h2 class="text-sm font-bold text-white">📅 Convocar Nueva Reunión Oficial en #🗓️┊ʀᴇᴜɴɪᴏɴᴇs</h2>
+              <p class="text-xs text-slate-400">Publica la convocatoria en Discord con los botones interactivos [Confirmar Asistencia] y [No puedo asistir]</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end text-xs">
+              <div>
+                <label class="block text-slate-400 mb-1">Fecha y Hora</label>
+                <input id="reunion-fecha" type="text" placeholder="Ej: Hoy 22:00hs (Hora Hub)" value="Hoy 22:00hs (Hora Hub)" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white" />
+              </div>
+              <div>
+                <label class="block text-slate-400 mb-1">Temario / Motivo de la Reunión</label>
+                <input id="reunion-tema" type="text" placeholder="Ej: Balance semanal, ascensos y operativos" value="Balance semanal, entrega de bonos y asignación de operativos" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white" />
+              </div>
+              <div>
+                <button onclick="convocarReunionDiscord()" class="gold-btn w-full py-2.5 px-4 rounded-xl font-extrabold transition">
+                  📢 Publicar Convocatoria en #reuniones
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 space-y-5">
+            <div class="border-b border-white/10 pb-4">
+              <h2 class="text-sm font-bold text-white">Control de Asistencia en Tiempo Real</h2>
+              <p class="text-xs text-slate-400">Sincronizado con las respuestas de los agentes en Discord</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div class="p-4 rounded-xl bg-black/40 border border-emerald-500/25 space-y-3">
+                <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span class="text-xs font-bold text-emerald-400 uppercase">✅ Confirmados</span>
+                  <span id="count-confirmados" class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-emerald-500/20 text-emerald-400">0</span>
+                </div>
+                <ul id="list-confirmados" class="space-y-2 text-xs"></ul>
+              </div>
+
+              <div class="p-4 rounded-xl bg-black/40 border border-rose-500/25 space-y-3">
+                <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span class="text-xs font-bold text-rose-400 uppercase">❌ Ausentes con Aviso</span>
+                  <span id="count-ausentes" class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-rose-500/20 text-rose-400">0</span>
+                </div>
+                <ul id="list-ausentes" class="space-y-2 text-xs"></ul>
+              </div>
+
+              <div class="p-4 rounded-xl bg-black/40 border border-amber-500/25 space-y-3">
+                <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                  <span class="text-xs font-bold text-amber-400 uppercase">⚠️ Pendientes</span>
+                  <span id="count-pendientes" class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-amber-500/20 text-amber-400">0</span>
+                </div>
+                <ul id="list-pendientes" class="space-y-2 text-xs"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PESTAÑA 6: ACCESOS, RRHH & SEGURIDAD ==================== -->
+        <section id="tab-accesos" class="hidden space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Crear nueva credencial -->
+            <div class="glass-card-gold rounded-2xl p-6 space-y-4">
+              <div class="border-b border-white/10 pb-3">
+                <h2 class="text-sm font-extrabold text-white">🔐 Crear Código de Acceso para Staff</h2>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  Habilitá a miembros de <strong>Rangos Altos</strong>, <strong>RRHH</strong> o <strong>Instructores</strong> para entrar al Panel con su Nombre IC y un código.
+                </p>
+              </div>
+
+              <div class="space-y-3 text-xs">
+                <div>
+                  <label class="block text-slate-300 font-semibold mb-1">Nombre y Apellido IC</label>
+                  <input id="staff-new-name" type="text" placeholder="Ej: Marcos Santana" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white" />
+                </div>
+
+                <div>
+                  <label class="block text-slate-300 font-semibold mb-1">División / Rango Autorizado</label>
+                  <select id="staff-new-role" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white">
+                    <option value="RRHH">💼・Recursos Humanos (RRHH)</option>
+                    <option value="Instructor">📘 Instructor / Evaluador</option>
+                    <option value="Direccion">👑 Dirección / Rango Alto</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-slate-300 font-semibold mb-1">Código de Seguridad / PIN</label>
+                  <div class="flex gap-2">
+                    <input id="staff-new-code" type="text" placeholder="Ej: IMP-4821" class="flex-1 px-3.5 py-2.5 rounded-xl bg-black/60 border border-amber-500/30 text-amber-300 font-mono font-bold" />
+                    <button type="button" onclick="generarCodigoAleatorio()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold">
+                      🎲 Generar
+                    </button>
+                  </div>
+                </div>
+
+                <button onclick="crearCredencialStaff()" class="gold-btn w-full py-2.5 rounded-xl font-extrabold transition">
+                  + Habilitar Acceso al Panel
+                </button>
+              </div>
+
+              <div class="pt-4 border-t border-white/10 space-y-2 text-xs">
+                <div class="font-bold text-amber-300">⚡ Auto-generación desde Discord:</div>
+                <p class="text-slate-400 leading-relaxed">
+                  Cualquier usuario que tenga rol de <strong>Rango Alto</strong>, <strong>💼・Recursos Humanos (RRHH)</strong> o <strong>📘 Instructor</strong> en Discord puede escribir <code class="text-amber-300 font-mono">/mi-acceso</code> en el servidor y el bot le entregará su código privado automáticamente.
+                </p>
+              </div>
+            </div>
+
+            <!-- Lista de credenciales activas y Estado del Rol RRHH -->
+            <div class="lg:col-span-2 space-y-6">
+              <div class="glass-card rounded-2xl p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                  <div>
+                    <h2 class="text-sm font-bold text-white">Permisos de Evaluación de Postulaciones en Discord</h2>
+                    <p class="text-xs text-slate-400">Roles configurados con acceso automático a los tickets de postulación y botones Aprobar/Rechazar</p>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    SINCRONIZADO
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div class="p-3.5 rounded-xl bg-black/40 border border-amber-500/30 space-y-1">
+                    <div class="font-bold text-amber-300">👑 Rangos Altos / Cúpula</div>
+                    <div class="text-slate-400">CEO, Co-Fundador, Director General, Socio, Subdirector, Jefe/Subjefe de Seguridad y Supervisores.</div>
+                  </div>
+                  <div class="p-3.5 rounded-xl bg-black/40 border border-emerald-500/30 space-y-1">
+                    <div class="font-bold text-emerald-400">💼・Recursos Humanos (RRHH)</div>
+                    <div class="text-slate-400">Rol creado y configurado en Discord con acceso a tickets, logs, contrataciones y panel web.</div>
+                  </div>
+                  <div class="p-3.5 rounded-xl bg-black/40 border border-blue-500/30 space-y-1">
+                    <div class="font-bold text-blue-400">📘 Instructores y Evaluadores</div>
+                    <div class="text-slate-400">Habilitados para ver tickets de postulación, elegir autorol y aprobar o rechazar postulantes.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass-card rounded-2xl p-6 space-y-4">
+                <div class="border-b border-white/10 pb-3 flex items-center justify-between">
+                  <div>
+                    <h2 class="text-sm font-bold text-white">Oficiales con Código de Acceso Personal Registrado</h2>
+                    <p class="text-xs text-slate-400">Pueden iniciar sesión con su Nombre IC y su Código de Seguridad</p>
+                  </div>
+                </div>
+                <div id="staff-users-list" class="space-y-2.5 text-xs"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PESTAÑA 7: CONSOLA DISCORD & CRON 24H ==================== -->
+        <section id="tab-discord" class="hidden space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="glass-card rounded-2xl p-6 space-y-4">
+              <div class="border-b border-white/10 pb-3">
+                <h2 class="text-sm font-bold text-white">Emitir Comunicado Oficial a Discord</h2>
+                <p class="text-xs text-slate-400">Envía anuncios con el escudo oficial de IMPERION Security a cualquier canal real del servidor</p>
+              </div>
+              <div class="space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-slate-400 mb-1">Canal del Servidor</label>
+                    <select id="anuncio-canal" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white"></select>
+                  </div>
+                  <div>
+                    <label class="block text-slate-400 mb-1">Mención a Notificar</label>
+                    <select id="anuncio-mencion" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white">
+                      <option value="@Empleados">@Empleados</option>
+                      <option value="@everyone">@everyone</option>
+                      <option value="@here">@here</option>
+                      <option value="Sin mención">Sin mención</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">Título del Comunicado</label>
+                  <input id="anuncio-titulo" type="text" value="COMUNICADO OFICIAL | IMPERION SECURITY" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white" />
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">Mensaje / Contenido</label>
+                  <textarea id="anuncio-mensaje" rows="4" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white">Se recuerda a todo el personal de IMPERION Security registrar su Entrada y Salida en #registro-de-horas y acudir con el uniforme reglamentario.</textarea>
+                </div>
+                <div>
+                  <label class="block text-slate-400 mb-1">URL de Imagen Adjunta (Opcional)</label>
+                  <input id="anuncio-imagen" type="text" placeholder="https://... (dejar vacío si no lleva imagen grande)" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-white" />
+                </div>
+                <button onclick="enviarComunicado()" class="gold-btn w-full py-2.5 rounded-xl font-extrabold transition">
+                  📤 Publicar Comunicado en Discord Ahora
+                </button>
+
+                <div class="pt-3 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button onclick="desplegarPanelClockDiscord()" class="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 font-semibold transition">
+                    ⏱️ Enviar Panel /clock a #registro-de-horas
+                  </button>
+                  <button onclick="desplegarPanelTicketsDiscord()" class="py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 font-semibold transition">
+                    🎫 Enviar Panel Tickets a #soporte
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 flex flex-col">
+              <div class="border-b border-white/10 pb-3 mb-3 flex items-center justify-between">
+                <div>
+                  <h2 class="text-sm font-bold text-white">Programación Automática 24h (21 Eventos Orion)</h2>
+                  <p class="text-xs text-slate-400">Se disparan automáticamente en #actividades-disponibles con imagen HD</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-400">ACTIVO</span>
+              </div>
+              <div id="schedule-list" class="space-y-2 overflow-y-auto max-h-96 custom-scroll text-xs pr-1"></div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL: GESTIÓN INTEGRAL DE EMPLEADO (PERFIL, ROLES DISCORD, SANCIONES Y DESPIDO CON MOTIVO AL MD) -->
+  <div id="modal-legajo" class="fixed inset-0 z-40 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-card-gold rounded-2xl max-w-2xl w-full p-6 space-y-5 my-8 max-h-[92vh] overflow-y-auto custom-scroll">
+      <div class="flex items-start justify-between border-b border-white/10 pb-4">
+        <div class="flex items-center gap-3.5">
+          <img id="legajo-avatar" src="/assets/logo.jpg" class="w-12 h-12 rounded-xl object-cover border border-amber-500/40" alt="Avatar" />
+          <div>
+            <span class="text-xs font-mono uppercase text-amber-400">Expediente Oficial & Gestión de Roles • IMPERION Security</span>
+            <h3 id="legajo-name" class="text-lg font-extrabold text-white mt-0.5"></h3>
+            <p id="legajo-meta" class="text-xs text-slate-400"></p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-legajo')" class="px-2.5 py-1 rounded-lg bg-white/5 text-xs text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <!-- KPIs rápidos del empleado -->
+      <div id="legajo-stats" class="grid grid-cols-3 gap-3 text-center"></div>
+
+      <!-- SECCIÓN 1: GESTIONAR PERFIL IC, ROL PRINCIPAL Y ROLES ESPECIALES EN DISCORD -->
+      <div class="p-4 rounded-xl bg-black/50 border border-white/10 space-y-3.5 text-xs">
+        <div class="font-bold text-amber-300 uppercase tracking-wider flex items-center justify-between">
+          <span>1. Perfil del Empleado y Roles de Discord en Vivo</span>
+          <span class="text-[11px] font-mono text-emerald-400">Sincronización Instantánea</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">Nombre y Apellido IC (Actualiza apodo en Discord)</label>
+            <input id="legajo-input-name" type="text" class="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-white font-semibold" />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Rol Jerárquico Principal en Discord</label>
+            <select id="legajo-rank-select" class="w-full px-3 py-2 rounded-xl bg-black/60 border border-amber-500/40 text-white font-semibold"></select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1.5">Roles Adicionales / Permisos Especiales en Discord:</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:border-emerald-500/40">
+              <input id="legajo-role-rrhh" type="checkbox" class="accent-emerald-500 w-4 h-4" />
+              <span class="font-semibold text-emerald-300">💼 RRHH</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:border-blue-500/40">
+              <input id="legajo-role-instructor" type="checkbox" class="accent-blue-500 w-4 h-4" />
+              <span class="font-semibold text-blue-300">📘 Instructor</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 border border-white/10 cursor-pointer hover:border-amber-500/40">
+              <input id="legajo-role-evaluador" type="checkbox" class="accent-amber-500 w-4 h-4" />
+              <span class="font-semibold text-amber-300">📋 Evaluador</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">Horas Semanales</label>
+            <input id="legajo-input-hours" type="number" step="0.5" class="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-white font-mono" />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Bono Extra ($)</label>
+            <input id="legajo-input-bonus" type="number" step="500" class="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-white font-mono" />
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Sanciones Acumuladas (0 a 3)</label>
+            <input id="legajo-input-warnings" type="number" min="0" max="3" class="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-white font-mono" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1">Notas / Observaciones del Legajo</label>
+          <input id="legajo-input-notes" type="text" placeholder="Ej: Especialista en escoltas, buena conducta..." class="w-full px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-white" />
+        </div>
+
+        <button onclick="guardarRangoLegajo()" class="gold-btn w-full py-2.5 rounded-xl font-extrabold transition">
+          💾 Guardar Perfil y Sincronizar Roles en Discord
+        </button>
+      </div>
+
+      <!-- SECCIÓN 2: APLICAR SANCIÓN CON MOTIVO (ENVÍA MD + LOG) -->
+      <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-3 text-xs">
+        <div class="font-bold text-amber-300 uppercase tracking-wider">
+          2. ⚠️ Aplicar Sanción / Advertencia (Notifica el Motivo por MD y #log)
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input id="legajo-sanction-reason" type="text" placeholder="Escribí el motivo de la sanción (se enviará al MD del empleado)..." class="flex-1 px-3 py-2 rounded-xl bg-black/60 border border-amber-500/30 text-white" />
+          <button onclick="sancionarAgenteActual()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold whitespace-nowrap transition">
+            ⚠️ Sancionar (+1) y Enviar MD
+          </button>
+        </div>
+        <div id="legajo-sanctions-history" class="space-y-1.5 text-[11px] text-slate-300"></div>
+      </div>
+
+      <!-- SECCIÓN 3: DESPEDIR / EXPULSAR CON MOTIVO (ENVÍA CARTA AL MD + QUITA ROLES / KICK + LOG #DESPEDIDO) -->
+      <div id="legajo-fire-section" class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/35 space-y-3 text-xs">
+        <div class="font-bold text-rose-400 uppercase tracking-wider flex items-center justify-between">
+          <span>3. 🚫 Despedir / Expulsar Empleado de IMPERION Security</span>
+          <span class="font-mono text-[11px] text-rose-300">Envía Carta al MD + Log en #🛫┊ᴅᴇsᴘᴇᴅɪᴅᴏ</span>
+        </div>
+        <div>
+          <label class="block text-rose-200/90 mb-1">Motivo del Despido / Expulsión (Se le enviará por mensaje privado MD al empleado):</label>
+          <textarea id="legajo-fire-reason" rows="2" placeholder="Ej: Inactividad prolongada sin aviso / Incumplimiento grave de protocolos de seguridad..." class="w-full px-3 py-2 rounded-xl bg-black/60 border border-rose-500/40 text-white"></textarea>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <label class="flex items-center gap-2 cursor-pointer text-rose-200">
+            <input id="legajo-fire-kick" type="checkbox" class="accent-rose-500 w-4 h-4" />
+            <span>🚪 <strong>Expulsar también del servidor de Discord (Kick)</strong> <span class="text-slate-400">(Si no marcás, solo le quita los roles de empresa)</span></span>
+          </label>
+          <button onclick="eliminarAgenteActual()" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold transition">
+            🚫 Confirmar Despido y Enviar MD
+          </button>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="closeModal('modal-legajo')" class="px-5 py-2 rounded-xl border border-white/15 text-xs text-slate-300 hover:bg-white/5">
+          Cerrar Expediente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DESPACHAR ACTIVIDAD -->
+  <div id="modal-actividad" class="fixed inset-0 z-40 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card-gold rounded-2xl max-w-md w-full p-6 space-y-4">
+      <h3 class="font-bold text-sm text-white">🚨 Publicar Operativo en #actividades-disponibles</h3>
+      <select id="select-actividad-tipo" class="w-full px-3 py-2.5 text-xs rounded-xl bg-black/60 border border-white/15 text-white">
+        <option value="atm|REABASTECER CAJEROS #4">REABASTECER CAJEROS #4</option>
+        <option value="alarm|INSTALACIÓN DE ALARMAS #1">INSTALACIÓN DE ALARMAS #1</option>
+        <option value="cam|REPARACIÓN DE CÁMARAS #3">REPARACIÓN DE CÁMARAS #3</option>
+        <option value="escort|SERVICIO DE ESCOLTA #3">SERVICIO DE ESCOLTA #3</option>
+        <option value="rev|REVISIÓN DE SEGURIDAD #1">REVISIÓN DE SEGURIDAD #1</option>
+      </select>
+      <div class="flex justify-end gap-2 pt-3">
+        <button onclick="closeModal('modal-actividad')" class="px-3.5 py-2 rounded-xl text-xs border border-white/15">Cancelar</button>
+        <button onclick="lanzarActividadDiscord()" class="gold-btn px-4 py-2 rounded-xl text-xs font-extrabold">Publicar en Discord</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONTRATAR -->
+  <div id="modal-contratar" class="fixed inset-0 z-40 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card-gold rounded-2xl max-w-md w-full p-6 space-y-4">
+      <h3 class="font-bold text-sm text-white">👮 Alta de Nuevo Agente</h3>
+      <div class="space-y-3 text-xs">
+        <input id="new-emp-name" type="text" placeholder="Nombre y Apellido IC" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white" />
+        <input id="new-emp-discord" type="text" placeholder="Usuario Discord (Ej: @marcos)" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white" />
+        <select id="new-emp-rank" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/15 text-white"></select>
+      </div>
+      <div class="flex justify-end gap-2 pt-3">
+        <button onclick="closeModal('modal-contratar')" class="px-3.5 py-2 rounded-xl text-xs border border-white/15">Cancelar</button>
+        <button onclick="contratarEmpleado()" class="gold-btn px-4 py-2 rounded-xl text-xs font-extrabold">Confirmar Alta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden glass-card-gold text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-3 max-w-sm">
+    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0"></span>
+    <span id="toast-text">Sincronizado</span>
+  </div>
+
+  <script>
+    let state = {
+      config: {},
+      guild: { roles: [], channels: [] },
+      rankRoles: [],
+      staffUsers: [],
+      employees: [],
+      applications: [],
+      rates: {},
+      activitiesLog: [],
+      feedEvents: [],
+      schedule: []
+    };
+    let selectedEmployeeId = null;
+    let selectorsInitialized = false;
+    let currentUser = null;
+
+    // Inicializar sesión guardada
+    function checkSavedSession() {
+      try {
+        const raw = localStorage.getItem("imperion_auth_user");
+        if (raw) {
+          currentUser = JSON.parse(raw);
+          applyLoggedUserUI();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function applyLoggedUserUI() {
+      const overlay = document.getElementById("login-overlay");
+      if (!currentUser) {
+        overlay.classList.remove("hidden");
+        return;
+      }
+      overlay.classList.add("hidden");
+      const label = `${currentUser.icName} (${currentUser.roleTitle})`;
+      const badge = document.getElementById("logged-user-badge");
+      if (badge) badge.textContent = `👤 ${label}`;
+      const revPreview = document.getElementById("active-reviewer-preview");
+      if (revPreview) revPreview.textContent = label;
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const icName = document.getElementById("login-ic-name").value.trim();
+      const roleChoice = document.getElementById("login-role-choice").value;
+      const securityCode = document.getElementById("login-security-code").value.trim();
+      const errBox = document.getElementById("login-error");
+      errBox.classList.add("hidden");
+
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ icName, roleChoice, securityCode })
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          errBox.textContent = data.error || "Código inválido.";
+          errBox.classList.remove("hidden");
+          return;
+        }
+        currentUser = data.user;
+        localStorage.setItem("imperion_auth_user", JSON.stringify(currentUser));
+        applyLoggedUserUI();
+        showToast(`Bienvenido/a ${currentUser.icName} • ${currentUser.roleTitle}`);
+      } catch (err) {
+        errBox.textContent = "Error de conexión con el servidor.";
+        errBox.classList.remove("hidden");
+      }
+    }
+
+    function logoutUser() {
+      currentUser = null;
+      localStorage.removeItem("imperion_auth_user");
+      document.getElementById("login-security-code").value = "";
+      applyLoggedUserUI();
+    }
+
+    function getCurrentReviewerSignature() {
+      if (!currentUser) return "Dirección / RRHH";
+      return `${currentUser.icName} (${currentUser.roleTitle})`;
+    }
+
+    async function fetchState() {
+      try {
+        const res = await fetch("/api/state");
+        state = await res.json();
+        populateDynamicSelectors();
+        renderAll();
+      } catch (e) {
+        console.error("Error sincronizando estado:", e);
+      }
+    }
+
+    function getAvailableRoles() {
+      if (state.guild && state.guild.roles && state.guild.roles.length) {
+        return state.guild.roles;
+      }
+      if (state.rankRoles && state.rankRoles.length) {
+        return state.rankRoles;
+      }
+      return [
+        { id: "1563510109513195550", name: "🛡️・Agente de Seguridad" },
+        { id: "1563509992680726608", name: "📋 Evaluador" },
+        { id: "1563509865350168598", name: "📘 Instructor" },
+        { id: "1563509826833879141", name: "📋 Supervisor" }
+      ];
+    }
+
+    function populateDynamicSelectors() {
+      const roles = getAvailableRoles();
+      const defaultAutoRoleId = state.config?.autoRoleApproveId || "1563510109513195550";
+
+      const roleOptionsHtml = roles
+        .map(r => `<option value="${r.id}">${r.name}</option>`)
+        .join("");
+
+      const autoRoleSelect = document.getElementById("config-autorole-select");
+      if (autoRoleSelect && (!selectorsInitialized || autoRoleSelect.options.length !== roles.length)) {
+        const currentVal = autoRoleSelect.value || defaultAutoRoleId;
+        autoRoleSelect.innerHTML = roleOptionsHtml;
+        autoRoleSelect.value = currentVal;
+        const chk = document.getElementById("config-give-empleados");
+        if (chk && state.config) chk.checked = state.config.giveEmpleadosRoleOnApprove !== false;
+      }
+
+      const legajoSelect = document.getElementById("legajo-rank-select");
+      if (legajoSelect && legajoSelect.options.length !== roles.length) {
+        legajoSelect.innerHTML = roleOptionsHtml;
+      }
+
+      const newEmpRank = document.getElementById("new-emp-rank");
+      if (newEmpRank && newEmpRank.options.length !== roles.length) {
+        newEmpRank.innerHTML = roleOptionsHtml;
+        newEmpRank.value = defaultAutoRoleId;
+      }
+
+      const channelSelect = document.getElementById("anuncio-canal");
+      const channels = state.guild?.channels || [];
+      if (channelSelect && channels.length && channelSelect.options.length !== channels.length) {
+        const prevCh = channelSelect.value || state.config?.anunciosChannelId || "1563511678254190602";
+        channelSelect.innerHTML = channels
+          .map(c => `<option value="${c.id}">#${c.name}</option>`)
+          .join("");
+        channelSelect.value = prevCh;
+      }
+
+      selectorsInitialized = true;
+    }
+
+    function formatMoney(num) {
+      return "$" + Number(num || 0).toLocaleString("es-AR");
+    }
+
+    function renderAll() {
+      const employees = state.employees || [];
+      const inService = employees.filter(e => e.onDuty).length;
+      const totalHours = employees.reduce((acc, e) => acc + (e.hours || 0), 0);
+      const totalBonus = employees.reduce((acc, e) => acc + (e.calculatedBonus || 0), 0);
+
+      document.getElementById("kpi-empleados").textContent = employees.length;
+      document.getElementById("badge-total-emp").textContent = employees.length;
+      document.getElementById("kpi-en-servicio").textContent = inService;
+      document.getElementById("badge-on-duty").textContent = inService;
+
+      const h = Math.floor(totalHours);
+      const m = Math.round((totalHours - h) * 60);
+      document.getElementById("kpi-horas").textContent = `${h}h ${String(m).padStart(2, "0")}m`;
+      document.getElementById("kpi-bonos").textContent = formatMoney(totalBonus);
+
+      const pendingApps = (state.applications || []).filter(a => a.status === "Pendiente");
+      const badgePost = document.getElementById("badge-postulaciones");
+      if (badgePost) badgePost.textContent = pendingApps.length;
+
+      renderLiveDuty();
+      renderFeed();
+      renderEmployees();
+      renderApplications();
+      renderStaffUsers();
+      renderActivitiesLog();
+      renderMeetings();
+      renderSchedule();
+      updateNextActivityCountdown();
+    }
+
+    function renderStaffUsers() {
+      const container = document.getElementById("staff-users-list");
+      if (!container) return;
+      const list = state.staffUsers || [];
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="p-4 rounded-xl bg-black/40 border border-white/10 text-slate-400">
+            Código Maestro activo para Cúpula / RRHH / Instructores: <code class="text-amber-300 font-mono font-bold">${state.config?.masterSecurityCode || "IMP-2026"}</code>.
+            Podés crear códigos individuales con el formulario de la izquierda o escribiendo <code class="text-amber-300 font-mono">/mi-acceso</code> en Discord.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(u => `
+        <div class="p-3.5 rounded-xl bg-black/40 border border-white/10 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <span class="font-bold text-white">${u.icName}</span>
+            <span class="ml-2 px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 font-semibold">${u.roleTitle}</span>
+            <span class="ml-2 text-slate-400 font-mono">${u.discordTag || ""}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded-lg bg-black/60 border border-amber-500/30 font-mono font-bold text-emerald-400">${u.securityCode}</span>
+            <button onclick="eliminarCredencialStaff('${u.id}')" class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 font-bold">
+              Revocar
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function generarCodigoAleatorio() {
+      const pin = "IMP-" + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById("staff-new-code").value = pin;
+    }
+
+    async function crearCredencialStaff() {
+      const icName = document.getElementById("staff-new-name").value.trim();
+      const accessLevel = document.getElementById("staff-new-role").value;
+      const securityCode = document.getElementById("staff-new-code").value.trim();
+      if (!icName || !securityCode) {
+        showToast("Completá el Nombre IC y el Código de Seguridad");
+        return;
+      }
+      const res = await fetch("/api/staff/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ icName, accessLevel, securityCode })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        document.getElementById("staff-new-name").value = "";
+        document.getElementById("staff-new-code").value = "";
+        fetchState();
+        showToast(`Acceso habilitado para ${icName} (Código: ${securityCode})`);
+      } else {
+        showToast("Error: " + (data.error || ""));
+      }
+    }
+
+    async function eliminarCredencialStaff(id) {
+      await fetch("/api/staff/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      fetchState();
+      showToast("Credencial revocada");
+    }
+
+    function updateNextActivityCountdown() {
+      const sched = state.schedule || [];
+      if (!sched.length) return;
+      const now = new Date();
+      const nowMins = now.getHours() * 60 + now.getMinutes();
+
+      let nextItem = sched.find(s => (s.hour * 60 + s.minute) > nowMins) || sched[0];
+      let targetMins = nextItem.hour * 60 + nextItem.minute;
+      let diffMins = targetMins - nowMins;
+      if (diffMins <= 0) diffMins += 24 * 60;
+
+      const h = Math.floor(diffMins / 60);
+      const m = diffMins % 60;
+      const s = 59 - now.getSeconds();
+
+      document.getElementById("next-activity-name").textContent = nextItem.title;
+      document.getElementById("next-activity-countdown").textContent =
+        `${String(h).padStart(2, "0")}h ${String(m - 1 < 0 ? 0 : m - 1).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
+    }
+
+    function renderLiveDuty() {
+      const container = document.getElementById("live-duty-list");
+      const active = (state.employees || []).filter(e => e.onDuty);
+      if (!active.length) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400 border border-dashed border-white/10 rounded-xl">No hay unidades en servicio activo en este instante. Cuando un agente toque "Entrada" en Discord aparecerá aquí.</div>`;
+        return;
+      }
+      container.innerHTML = active.map(e => `
+        <div class="p-4 rounded-xl bg-black/40 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs">
+              ${e.name.slice(0, 2).toUpperCase()}
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">${e.name} <span class="font-mono text-slate-400">${e.discord}</span></div>
+              <div class="text-xs text-slate-400">${e.rank} • Acumulado semanal: <strong class="text-amber-400">${e.hours.toFixed(1)}h</strong></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-xs font-mono font-bold text-emerald-400">EN SERVICIO (${e.dutySince})</span>
+            <button onclick="toggleDuty('${e.id}')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25">Cerrar Turno</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderFeed() {
+      const feed = state.feedEvents || [];
+      if (!feed.length) {
+        document.getElementById("discord-feed").innerHTML = `<div class="p-6 text-center text-xs text-slate-500">Sin eventos registrados aún.</div>`;
+        return;
+      }
+      document.getElementById("discord-feed").innerHTML = feed.map(ev => `
+        <div class="p-3 rounded-xl bg-black/40 border border-white/10 text-xs space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded font-mono text-xs bg-amber-500/15 text-amber-400 font-bold">${ev.tag}</span>
+            <span class="text-slate-400 font-mono">${ev.time}</span>
+          </div>
+          <p class="text-slate-200">${ev.text}</p>
+        </div>
+      `).join("");
+    }
+
+    function renderEmployees() {
+      const q = (document.getElementById("search-empleado")?.value || "").toLowerCase();
+      const statusFilter = document.getElementById("filter-status")?.value || "all";
+      const roles = getAvailableRoles();
+
+      const filtered = (state.employees || []).filter(e => {
+        const matchText =
+          (e.name || "").toLowerCase().includes(q) ||
+          (e.rank || "").toLowerCase().includes(q) ||
+          (e.discord || "").toLowerCase().includes(q) ||
+          (e.notes || "").toLowerCase().includes(q);
+        const matchStatus = statusFilter === "all" || (statusFilter === "duty" && e.onDuty) || (statusFilter === "off" && !e.onDuty);
+        return matchText && matchStatus;
+      });
+
+      if (!filtered.length) {
+        document.getElementById("employees-table-body").innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-400">No hay empleados que coincidan. Podés tocar "🔄 Sincronizar Empleados de Discord" o "+ Contratar".</td></tr>`;
+        return;
+      }
+
+      document.getElementById("employees-table-body").innerHTML = filtered.map(e => {
+        const pct = Math.min(100, Math.round(((e.hours || 0) / 12) * 100));
+        const barColor = pct >= 100 ? "bg-emerald-500" : pct >= 60 ? "bg-amber-500" : "bg-blue-500";
+        const avatarUrl = e.avatar || "/assets/logo.jpg";
+
+        const specialBadges = (e.specialRoles || []).map(sr => {
+          if (sr === "RRHH") return `<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">💼 RRHH</span>`;
+          if (sr === "Instructor") return `<span class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] font-bold">📘 Instructor</span>`;
+          if (sr === "Evaluador") return `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">📋 Evaluador</span>`;
+          return "";
+        }).join(" ");
+
+        const roleSelectHtml = roles.map(r => {
+          const isSelected = String(r.id) === String(e.roleId) || r.name === e.rank;
+          return `<option value="${r.id}" ${isSelected ? "selected" : ""}>${r.name}</option>`;
+        }).join("");
+
+        const warnBadge = (e.warnings || 0) > 0
+          ? `<span class="ml-1.5 px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 font-mono font-bold text-[11px]">⚠️ ${e.warnings}/3</span>`
+          : `<span class="ml-1.5 px-2 py-0.5 rounded bg-white/5 text-slate-400 font-mono text-[11px]">0/3 Sanc.</span>`;
+
+        return `
+          <tr class="hover:bg-white/5 transition">
+            <td class="py-3.5 px-4">
+              <div class="flex items-center gap-3">
+                <img src="${avatarUrl}" class="w-9 h-9 rounded-xl object-cover border border-amber-500/30 shrink-0" alt="Avatar" />
+                <div>
+                  <div class="font-bold text-white flex items-center gap-1.5 flex-wrap">
+                    <span>${e.name}</span>
+                    ${specialBadges}
+                  </div>
+                  <div class="text-xs font-mono text-slate-400">${e.discord} ${e.notes ? `• <span class="text-slate-500 italic">${e.notes}</span>` : ""}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3.5 px-4">
+              <select onchange="cambiarRolDirectoTabla('${e.id}', this)" class="px-2.5 py-1.5 rounded-xl bg-black/60 border border-amber-500/30 text-amber-300 font-semibold text-xs focus:outline-none focus:border-amber-400">
+                ${roleSelectHtml}
+              </select>
+            </td>
+            <td class="py-3.5 px-4">
+              <div class="flex items-center gap-1 flex-wrap">
+                <button onclick="toggleDuty('${e.id}')" class="px-2 py-0.5 rounded-lg border text-xs font-bold transition ${e.onDuty ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-white/5 text-slate-400 border-white/10 hover:text-white'}">
+                  ${e.onDuty ? '🟢 En Servicio' : '⚪ Fuera'}
+                </button>
+                ${warnBadge}
+              </div>
+            </td>
+            <td class="py-3.5 px-4 w-44">
+              <div class="flex justify-between text-xs mb-1"><span class="font-mono font-bold">${(e.hours || 0).toFixed(1)}h</span><span class="text-slate-400">${pct}%</span></div>
+              <div class="w-full h-2 rounded-full bg-black/60"><div class="${barColor} h-full rounded-full" style="width:${pct}%"></div></div>
+            </td>
+            <td class="py-3.5 px-4 font-mono text-xs text-slate-300">
+              CAJ:${e.atm||0} • ALA:${e.alarm||0} • CAM:${e.cam||0} • ESC:${e.escort||0} • REV:${e.rev||0}
+            </td>
+            <td class="py-3.5 px-4 font-mono font-extrabold text-amber-400">${formatMoney(e.calculatedBonus)}</td>
+            <td class="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
+              <button onclick="addHour('${e.id}')" title="Sumar 1 hora" class="px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:border-amber-500">+1h</button>
+              <button onclick="addBonus('${e.id}')" title="Sumar Bono $5.000" class="px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:border-amber-500">+Bono</button>
+              <button onclick="openLegajo('${e.id}', false)" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold transition">
+                ⚙️ Perfil / Roles
+              </button>
+              <button onclick="openLegajo('${e.id}', true)" class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold transition">
+                🚫 Despedir
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function cambiarRolDirectoTabla(empId, selectEl) {
+      const roleId = selectEl.value;
+      const rank = selectEl.options[selectEl.selectedIndex]?.text || "";
+      const reviewerName = getCurrentReviewerSignature();
+      const res = await fetch("/api/employee/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: empId, roleId, rank, reviewerName })
+      });
+      const data = await res.json();
+      await fetchState();
+      if (data.ok) {
+        showToast(`✅ Rol modificado en Discord: ${rank}`);
+      } else {
+        showToast(`❌ Error cambiando rol: ${data.error || ""}`);
+      }
+    }
+
+    async function sincronizarEmpleadosDiscord() {
+      showToast("🔄 Sincronizando empleados y roles desde Discord...");
+      const res = await fetch("/api/employee/sync-discord", { method: "POST" });
+      const data = await res.json();
+      await fetchState();
+      if (data.ok) {
+        showToast(`✅ ${data.total} empleados sincronizados con Discord`);
+      } else {
+        showToast(`❌ Error al sincronizar: ${data.error || ""}`);
+      }
+    }
+
+    function renderApplications() {
+      const container = document.getElementById("applications-container");
+      const historyContainer = document.getElementById("applications-history");
+      if (!container) return;
+
+      const roles = getAvailableRoles();
+      const defaultRoleId = state.config?.autoRoleApproveId || "1563510109513195550";
+
+      const pending = (state.applications || []).filter(a => a.status === "Pendiente");
+      const evaluated = (state.applications || []).filter(a => a.status !== "Pendiente");
+
+      if (!pending.length) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400 border border-dashed border-white/10 rounded-xl">No hay solicitudes de ingreso pendientes. Cuando un postulante envíe su formulario en el ticket de Discord, aparecerá aquí instantáneamente para que Rangos Altos, RRHH o Instructores la evalúen.</div>`;
+      } else {
+        container.innerHTML = pending.map(app => {
+          const imgsHtml = (app.images && app.images.length)
+            ? app.images.map((url, idx) => `<a href="${url}" target="_blank" class="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 font-bold">📸 Ver Captura Sin Recorte #${idx + 1}</a>`).join(" ")
+            : `<span class="text-slate-500">Sin capturas adjuntas en el ticket</span>`;
+
+          const roleSelectOptions = roles
+            .map(r => `<option value="${r.id}" ${r.id === defaultRoleId ? "selected" : ""}>${r.name}</option>`)
+            .join("");
+
+          return `
+            <div class="p-5 rounded-2xl bg-black/50 border border-amber-500/30 space-y-4 text-xs">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div>
+                  <span class="text-base font-extrabold text-white">${app.nombreHash}</span>
+                  <span class="ml-2 font-mono text-amber-400">${app.discordTag}</span>
+                </div>
+                <span class="px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-300 font-mono">Recibida ${app.createdAt}</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+                  <div class="text-slate-400 mb-1">Residencia | Celular | Nivel | País</div>
+                  <div class="font-semibold text-white">${app.datosPersonales}</div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/10">
+                  <div class="text-slate-400 mb-1">Disponibilidad Horaria ((Hora Hub))</div>
+                  <div class="font-semibold text-white">${app.disponibilidad}</div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 md:col-span-2">
+                  <div class="text-slate-400 mb-1">Experiencia en Seguridad / Otros Rubros y Antecedentes</div>
+                  <div class="font-semibold text-white">${app.experiencia}</div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 md:col-span-2 flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span class="text-slate-400">Sanciones / Reportes Abiertos:</span>
+                    <strong class="ml-1 text-white">${app.sancionesReportes}</strong>
+                  </div>
+                  <div class="flex flex-wrap gap-2">${imgsHtml}</div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-white/10 grid grid-cols-1 lg:grid-cols-2 gap-3 items-center">
+                <div class="flex flex-wrap items-center gap-2">
+                  <select id="app-role-${app.id}" class="px-3 py-2 rounded-xl bg-black/60 border border-amber-500/40 text-white font-semibold">
+                    ${roleSelectOptions}
+                  </select>
+                  <button onclick="aprobarPostulacion('${app.id}')" class="px-4 py-2 rounded-xl font-extrabold bg-emerald-600 hover:bg-emerald-500 text-white transition">
+                    ✅ Aprobar (Dar Autorol + Log + MD)
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <input id="app-reject-reason-${app.id}" type="text" placeholder="Motivo del rechazo (se enviará al log y MD)..." class="flex-1 px-3 py-2 rounded-xl bg-black/60 border border-white/15 text-white" />
+                  <button onclick="rechazarPostulacion('${app.id}')" class="px-4 py-2 rounded-xl font-extrabold bg-rose-600 hover:bg-rose-500 text-white transition whitespace-nowrap">
+                    ❌ Rechazar + Log
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      if (historyContainer) {
+        if (!evaluated.length) {
+          historyContainer.innerHTML = `<div class="p-4 text-center text-slate-500">Todavía no hay postulaciones evaluadas en el historial.</div>`;
+        } else {
+          historyContainer.innerHTML = evaluated.map(a => {
+            const isApproved = a.status === "Aprobado";
+            const byWho = isApproved ? (a.approvedBy || "Dirección") : (a.rejectedBy || "Dirección");
+            return `
+              <div class="p-3.5 rounded-xl bg-black/40 border ${isApproved ? "border-emerald-500/30" : "border-rose-500/30"} flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <span class="font-bold text-white">${a.nombreHash}</span>
+                  <span class="text-slate-400 font-mono ml-1">${a.discordTag}</span>
+                  <span class="text-slate-400 ml-2">• ${isApproved ? `Rol otorgado: <strong class="text-amber-300">${a.approvedRole || "Asignado"}</strong>` : `Motivo: <em class="text-rose-300">${a.rejectReason || "-"}</em>`}</span>
+                  <span class="text-slate-500 ml-2">• Evaluado por: <strong class="text-slate-300">${byWho}</strong></span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full font-bold ${isApproved ? "bg-emerald-500/20 text-emerald-400" : "bg-rose-500/20 text-rose-400"}">
+                  ${isApproved ? "✅ APROBADA" : "❌ RECHAZADA"}
+                </span>
+              </div>
+            `;
+          }).join("");
+        }
+      }
+    }
+
+    function renderActivitiesLog() {
+      const log = state.activitiesLog || [];
+      if (!log.length) {
+        document.getElementById("activities-log").innerHTML = `<div class="p-8 text-center text-xs text-slate-400 border border-dashed border-white/10 rounded-xl">Aún no se certificaron actividades en esta semana.</div>`;
+        return;
+      }
+      document.getElementById("activities-log").innerHTML = log.map(a => `
+        <div class="p-3.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between text-xs">
+          <div>
+            <div class="font-bold text-white">${a.type}</div>
+            <div class="text-slate-400">${a.emp} • ${a.time}</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="font-mono font-bold text-amber-400">${a.reward}</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold">${a.status}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderMeetings() {
+      const emps = state.employees || [];
+      const confirmados = emps.filter(e => e.attendance === "Confirmado");
+      const ausentes = emps.filter(e => e.attendance === "Ausente");
+      const pendientes = emps.filter(e => e.attendance === "Pendiente");
+
+      document.getElementById("count-confirmados").textContent = confirmados.length;
+      document.getElementById("count-ausentes").textContent = ausentes.length;
+      document.getElementById("count-pendientes").textContent = pendientes.length;
+
+      document.getElementById("list-confirmados").innerHTML = confirmados.map(e => `<li class="p-2.5 rounded-lg bg-white/5 border border-white/10 flex justify-between"><span>${e.name}</span><span class="text-amber-300">${e.rank}</span></li>`).join("");
+      document.getElementById("list-ausentes").innerHTML = ausentes.map(e => `<li class="p-2.5 rounded-lg bg-white/5 border border-white/10"><div><strong>${e.name}</strong></div><div class="text-slate-400">"${e.reason}"</div></li>`).join("");
+      document.getElementById("list-pendientes").innerHTML = pendientes.map(e => `<li class="p-2.5 rounded-lg bg-white/5 border border-white/10 flex justify-between"><span>${e.name}</span><button onclick="confirmarAsistencia('${e.id}')" class="text-amber-400 font-bold">Confirmar</button></li>`).join("");
+    }
+
+    function renderSchedule() {
+      document.getElementById("schedule-list").innerHTML = (state.schedule || []).map(item => `
+        <div class="p-3 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between">
+          <span class="font-semibold text-white">| ${item.title}</span>
+          <span class="font-mono font-bold text-amber-400">${String(item.hour).padStart(2, "0")}:${String(item.minute).padStart(2, "0")}:00</span>
+        </div>
+      `).join("");
+    }
+
+    async function guardarConfigAutorol() {
+      const autoRoleApproveId = document.getElementById("config-autorole-select").value;
+      const giveEmpleadosRoleOnApprove = document.getElementById("config-give-empleados").checked;
+      const res = await fetch("/api/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ autoRoleApproveId, giveEmpleadosRoleOnApprove })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        await fetchState();
+        showToast("Autorol predeterminado guardado correctamente");
+      } else {
+        showToast("Error guardando configuración: " + (data.error || ""));
+      }
+    }
+
+    async function despacharRapido(key, title) {
+      const res = await fetch("/api/discord/activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, title })
+      });
+      const data = await res.json();
+      fetchState();
+      if (data.ok) {
+        showToast(`Operativo enviado a Discord con foto HD: ${title}`);
+      } else {
+        showToast(`Error: ${data.error || "No se pudo enviar"}`);
+      }
+    }
+
+    async function reenviarPanelClock() {
+      await fetch("/api/discord/create-counters", { method: "POST" });
+      showToast("Rol RRHH, contadores y canales de logs sincronizados");
+    }
+
+    async function desplegarPanelClockDiscord() {
+      const res = await fetch("/api/discord/panel-clock", { method: "POST" });
+      const data = await res.json();
+      if (data.ok) showToast("Panel /clock publicado en #registro-de-horas");
+      else showToast("Error: " + (data.error || ""));
+    }
+
+    async function desplegarPanelTicketsDiscord() {
+      const res = await fetch("/api/discord/panel-tickets", { method: "POST" });
+      const data = await res.json();
+      if (data.ok) showToast("Panel de Tickets publicado en #soporte");
+      else showToast("Error: " + (data.error || ""));
+    }
+
+    async function convocarReunionDiscord() {
+      const fechaHora = document.getElementById("reunion-fecha").value.trim();
+      const tema = document.getElementById("reunion-tema").value.trim();
+      const res = await fetch("/api/discord/reunion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fechaHora, tema })
+      });
+      const data = await res.json();
+      fetchState();
+      if (data.ok) showToast("Convocatoria de reunión publicada en #reuniones");
+      else showToast("Error: " + (data.error || ""));
+    }
+
+    async function aprobarPostulacion(id) {
+      const sel = document.getElementById(`app-role-${id}`);
+      const roleId = sel ? sel.value : (state.config?.autoRoleApproveId || "1563510109513195550");
+      const rank = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "🛡️・Agente de Seguridad";
+      const giveEmpleadosRole = document.getElementById("config-give-empleados")?.checked ?? true;
+      const reviewerName = getCurrentReviewerSignature();
+
+      const res = await fetch("/api/applications/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, roleId, rank, giveEmpleadosRole, reviewerName })
+      });
+      const data = await res.json();
+      fetchState();
+      if (data.ok) {
+        showToast(`Aprobado por ${reviewerName}: Autorol "${rank}" asignado y log enviado`);
+      } else {
+        showToast("Error al aprobar: " + (data.error || ""));
+      }
+    }
+
+    async function rechazarPostulacion(id) {
+      const reason = document.getElementById(`app-reject-reason-${id}`)?.value.trim() || "No cumple con los requisitos solicitados.";
+      const reviewerName = getCurrentReviewerSignature();
+
+      const res = await fetch("/api/applications/reject", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, reason, reviewerName })
+      });
+      const data = await res.json();
+      fetchState();
+      if (data.ok) {
+        showToast(`Rechazado por ${reviewerName}: Log publicado y ticket cerrado`);
+      } else {
+        showToast("Error al rechazar: " + (data.error || ""));
+      }
+    }
+
+    async function toggleDuty(id) {
+      await fetch("/api/duty/toggle", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+      fetchState();
+      showToast("Estado de servicio y rol actualizados");
+    }
+
+    async function addHour(id) {
+      await fetch("/api/employee/hour", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, amount: 1 }) });
+      fetchState();
+      showToast("+1.0h acreditada");
+    }
+
+    async function addBonus(id) {
+      await fetch("/api/employee/bonus", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, amount: 5000 }) });
+      fetchState();
+      showToast("Bono de $5.000 acreditado");
+    }
+
+    async function contratarEmpleado() {
+      const name = document.getElementById("new-emp-name").value.trim();
+      const discord = document.getElementById("new-emp-discord").value.trim();
+      const sel = document.getElementById("new-emp-rank");
+      const roleId = sel.value;
+      const rank = sel.options[sel.selectedIndex]?.text || "🛡️・Agente de Seguridad";
+      await fetch("/api/employee/hire", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, discord, roleId, rank }) });
+      closeModal("modal-contratar");
+      fetchState();
+      showToast("Agente dado de alta");
+    }
+
+    function openLegajo(id, focusFire = false) {
+      selectedEmployeeId = id;
+      const emp = (state.employees || []).find(e => String(e.id) === String(id));
+      if (!emp) return;
+
+      document.getElementById("legajo-name").textContent = emp.name;
+      document.getElementById("legajo-meta").textContent = `${emp.discord} • ID Discord: ${emp.discordId || emp.id} • Rol Actual: ${emp.rank}`;
+      const avatarEl = document.getElementById("legajo-avatar");
+      if (avatarEl) avatarEl.src = emp.avatar || "/assets/logo.jpg";
+
+      document.getElementById("legajo-input-name").value = emp.name || "";
+      document.getElementById("legajo-input-hours").value = Number(emp.hours || 0).toFixed(1);
+      document.getElementById("legajo-input-bonus").value = Number(emp.bonusExtra || 0);
+      document.getElementById("legajo-input-warnings").value = Number(emp.warnings || 0);
+      document.getElementById("legajo-input-notes").value = emp.notes || "";
+      document.getElementById("legajo-sanction-reason").value = "";
+      document.getElementById("legajo-fire-reason").value = "";
+      document.getElementById("legajo-fire-kick").checked = false;
+
+      const sel = document.getElementById("legajo-rank-select");
+      if (emp.roleId) sel.value = emp.roleId;
+
+      const special = emp.specialRoles || [];
+      document.getElementById("legajo-role-rrhh").checked = special.includes("RRHH");
+      document.getElementById("legajo-role-instructor").checked = special.includes("Instructor");
+      document.getElementById("legajo-role-evaluador").checked = special.includes("Evaluador");
+
+      document.getElementById("legajo-stats").innerHTML = `
+        <div class="p-3 rounded-xl bg-black/50 border border-white/10"><div class="text-xs text-slate-400">Horas Semanales</div><div class="font-bold font-mono text-white mt-1">${(emp.hours || 0).toFixed(1)}h</div></div>
+        <div class="p-3 rounded-xl bg-black/50 border border-white/10"><div class="text-xs text-slate-400">Liquidación Total</div><div class="font-bold font-mono text-amber-400 mt-1">${formatMoney(emp.calculatedBonus)}</div></div>
+        <div class="p-3 rounded-xl bg-black/50 border border-white/10"><div class="text-xs text-slate-400">Sanciones</div><div class="font-bold font-mono text-rose-400 mt-1">${emp.warnings || 0} / 3</div></div>
+      `;
+
+      const histEl = document.getElementById("legajo-sanctions-history");
+      if (histEl) {
+        const hist = emp.sanctionsHistory || [];
+        if (!hist.length) {
+          histEl.innerHTML = `<div class="text-slate-500">Sin sanciones disciplinarias registradas en su historial.</div>`;
+        } else {
+          histEl.innerHTML = hist.map(h => `
+            <div class="p-2 rounded-lg bg-black/40 border border-amber-500/20 flex flex-wrap justify-between gap-2">
+              <span><strong>#${h.warningCount}/3:</strong> "${h.reason}" <span class="text-slate-400">(Por ${h.by})</span></span>
+              <span class="font-mono text-slate-400">${h.date}</span>
+            </div>
+          `).join("");
+        }
+      }
+
+      openModal("modal-legajo");
+
+      if (focusFire) {
+        setTimeout(() => {
+          const fireInput = document.getElementById("legajo-fire-reason");
+          if (fireInput) {
+            fireInput.scrollIntoView({ behavior: "smooth", block: "center" });
+            fireInput.focus();
+          }
+        }, 120);
+      }
+    }
+
+    async function guardarRangoLegajo() {
+      const name = document.getElementById("legajo-input-name").value.trim();
+      const sel = document.getElementById("legajo-rank-select");
+      const roleId = sel.value;
+      const rank = sel.options[sel.selectedIndex]?.text || "";
+      const hours = Number(document.getElementById("legajo-input-hours").value || 0);
+      const bonusExtra = Number(document.getElementById("legajo-input-bonus").value || 0);
+      const warnings = Number(document.getElementById("legajo-input-warnings").value || 0);
+      const notes = document.getElementById("legajo-input-notes").value.trim();
+
+      const specialRoles = [];
+      if (document.getElementById("legajo-role-rrhh").checked) specialRoles.push("RRHH");
+      if (document.getElementById("legajo-role-instructor").checked) specialRoles.push("Instructor");
+      if (document.getElementById("legajo-role-evaluador").checked) specialRoles.push("Evaluador");
+
+      const reviewerName = getCurrentReviewerSignature();
+
+      const res = await fetch("/api/employee/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedEmployeeId,
+          name,
+          roleId,
+          rank,
+          specialRoles,
+          hours,
+          bonusExtra,
+          warnings,
+          notes,
+          reviewerName
+        })
+      });
+      const data = await res.json();
+      closeModal("modal-legajo");
+      await fetchState();
+      if (data.ok) {
+        showToast(`✅ Perfil y roles de Discord actualizados para ${name}`);
+      } else {
+        showToast(`❌ Error: ${data.error || ""}`);
+      }
+    }
+
+    async function sancionarAgenteActual() {
+      const reason = document.getElementById("legajo-sanction-reason").value.trim() || "Incumplimiento de normativa interna.";
+      const reviewerName = getCurrentReviewerSignature();
+
+      const res = await fetch("/api/employee/sanction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedEmployeeId, reason, reviewerName })
+      });
+      const data = await res.json();
+      await fetchState();
+      openLegajo(selectedEmployeeId, false);
+      if (data.ok) {
+        showToast(`⚠️ Sanción aplicada y enviada por MD al empleado`);
+      } else {
+        showToast(`❌ Error al sancionar: ${data.error || ""}`);
+      }
+    }
+
+    async function eliminarAgenteActual() {
+      const reason = document.getElementById("legajo-fire-reason").value.trim();
+      if (!reason) {
+        showToast("⚠️ Escribí el motivo del despido/expulsión para enviárselo por MD");
+        document.getElementById("legajo-fire-reason").focus();
+        return;
+      }
+      const kickFromServer = document.getElementById("legajo-fire-kick").checked;
+      const reviewerName = getCurrentReviewerSignature();
+
+      const res = await fetch("/api/employee/fire", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedEmployeeId,
+          reason,
+          kickFromServer,
+          reviewerName
+        })
+      });
+      const data = await res.json();
+      closeModal("modal-legajo");
+      await fetchState();
+      if (data.ok) {
+        showToast(`🚫 ${data.firedName} despedido • Motivo enviado al MD y a #despedido`);
+      } else {
+        showToast(`❌ Error al despedir: ${data.error || ""}`);
+      }
+    }
+
+    async function confirmarAsistencia(id) {
+      await fetch("/api/employee/update", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, attendance: "Confirmado" }) });
+      fetchState();
+      showToast("Asistencia confirmada");
+    }
+
+    async function saveRates() {
+      const rates = {
+        hour: Number(document.getElementById("rate-hour").value),
+        atm: Number(document.getElementById("rate-atm").value),
+        alarm: Number(document.getElementById("rate-alarm").value),
+        cam: Number(document.getElementById("rate-cam").value),
+        escort: Number(document.getElementById("rate-escort").value),
+        rev: Number(document.getElementById("rate-rev").value)
+      };
+      await fetch("/api/rates", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rates) });
+      fetchState();
+      showToast("Tarifas actualizadas");
+    }
+
+    async function resetWeekHours() {
+      await fetch("/api/reset-week", { method: "POST" });
+      fetchState();
+      showToast("Horas semanales reiniciadas");
+    }
+
+    async function liquidarSemana() {
+      const res = await fetch("/api/liquidar", { method: "POST" });
+      const data = await res.json();
+      fetchState();
+      if (data.ok) showToast("Liquidación semanal emitida en #🎊┊ʙᴏɴᴏꜱ");
+      else showToast("Error: " + (data.error || ""));
+    }
+
+    async function lanzarActividadDiscord() {
+      const [key, title] = document.getElementById("select-actividad-tipo").value.split("|");
+      await fetch("/api/discord/activity", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key, title }) });
+      closeModal("modal-actividad");
+      fetchState();
+      showToast(`Publicado en Discord: ${title}`);
+    }
+
+    async function enviarComunicado() {
+      const sel = document.getElementById("anuncio-canal");
+      const channelId = sel.value;
+      const channelName = sel.options[sel.selectedIndex]?.text || "";
+      const mention = document.getElementById("anuncio-mencion").value;
+      const title = document.getElementById("anuncio-titulo").value;
+      const message = document.getElementById("anuncio-mensaje").value;
+      const imageUrl = document.getElementById("anuncio-imagen")?.value.trim() || "";
+
+      const res = await fetch("/api/discord/comunicado", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channelId, channelName, mention, title, message, imageUrl })
+      });
+      const data = await res.json();
+      fetchState();
+      if (data.ok) {
+        showToast(`✅ Comunicado publicado en #${data.channelName}`);
+      } else {
+        showToast(`❌ Error enviando comunicado: ${data.error || "Revisá permisos"}`);
+      }
+    }
+
+    function switchTab(tab) {
+      ["resumen", "empleados", "postulaciones", "bonos", "reuniones", "accesos", "discord"].forEach(t => {
+        document.getElementById("tab-" + t).classList.add("hidden");
+        const nav = document.getElementById("nav-" + t);
+        if (nav) {
+          nav.classList.remove("nav-active");
+          nav.classList.add("text-slate-400");
+        }
+      });
+      document.getElementById("tab-" + tab).classList.remove("hidden");
+      const activeNav = document.getElementById("nav-" + tab);
+      if (activeNav) {
+        activeNav.classList.remove("text-slate-400");
+        activeNav.classList.add("nav-active");
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove("hidden"); }
+    function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+
+    let toastTimer;
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-text").textContent = msg;
+      toast.classList.remove("hidden");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.add("hidden"), 3500);
+    }
+
+    setInterval(() => {
+      const el = document.getElementById("live-clock");
+      if (el) el.textContent = new Date().toTimeString().split(" ")[0];
+      updateNextActivityCountdown();
+    }, 1000);
+
+    checkSavedSession();
+    fetchState();
+    setInterval(fetchState, 4000);
+  </script>
+</body>
+</html>
