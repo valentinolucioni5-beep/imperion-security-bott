@@ -71,6 +71,13 @@ const client = new Client({
   ]
 });
 
+client.on("error", err => {
+  console.error("⚠️ [Discord Client Error Ignorado]:", err?.message || err);
+});
+client.on("shardError", err => {
+  console.error("⚠️ [Discord Shard Error Ignorado]:", err?.message || err);
+});
+
 let isBotConnected = false;
 
 function getPrimaryGuild() {
@@ -1677,7 +1684,7 @@ client.on("interactionCreate", async interaction => {
       if (commandName === "mi-acceso") {
         const member = interaction.member;
         if (!canMemberReviewApplications(member)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "🚫 **Acceso restringido:** Solo los miembros de **Dirección (Rangos Altos)**, **Recursos Humanos (RRHH)** e **Instructores / Evaluadores** pueden obtener credenciales para el Panel Web.",
             ephemeral: true
           });
@@ -1734,13 +1741,16 @@ client.on("interactionCreate", async interaction => {
         addFeedEvent(db, "ACCESO", `Credencial Web activa para ${nombreIc} (${roleTitle})`);
         writeDb(db);
 
-        return interaction.reply({
+        const publicLink = db.config.publicDashboardUrl || "http://localhost:3000";
+
+        return await interaction.reply({
           content:
             `🔐 **Credencial de Acceso al Panel Web | IMPERION Security**\n\n` +
-            `• **Nombre dentro del juego (IC):** \`${staffEntry.icName}\`\n` +
-            `• **Código de Seguridad:** \`${staffEntry.securityCode}\`\n` +
-            `• **Rol reconocido:** **${staffEntry.roleTitle}**\n\n` +
-            `*Ingresá esos dos datos en la pantalla de Login del Panel Web para aprobar o rechazar solicitudes.*`,
+            `• **🌐 Link del Panel Web:** ${publicLink}\n` +
+            `• **🪪 Nombre dentro del juego (IC):** \`${staffEntry.icName}\`\n` +
+            `• **🔑 Código de Seguridad:** \`${staffEntry.securityCode}\`\n` +
+            `• **🎖️ Rol reconocido:** **${staffEntry.roleTitle}**\n\n` +
+            `*Abrí el link de arriba e ingresá tu Nombre IC y Código de Seguridad.*`,
           ephemeral: true
         });
       }
@@ -1801,14 +1811,14 @@ client.on("interactionCreate", async interaction => {
 
       if (commandName === "contratar") {
         if (!canMemberReviewApplications(interaction.member)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "🚫 Solo **Rangos Altos**, **RRHH** e **Instructores** pueden usar `/contratar`.",
             ephemeral: true
           });
         }
         const user = interaction.options.getUser("usuario");
         if (user.bot) {
-          return interaction.reply({ content: "⚠️ No podés contratar a un bot.", ephemeral: true });
+          return await interaction.reply({ content: "⚠️ No podés contratar a un bot.", ephemeral: true });
         }
         const nombreIc = interaction.options.getString("nombre_ic");
         const selectedRole = interaction.options.getRole("rol");
@@ -1835,14 +1845,14 @@ client.on("interactionCreate", async interaction => {
 
       if (commandName === "ascender") {
         if (!canMemberReviewApplications(interaction.member)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "🚫 Solo **Rangos Altos** y **RRHH** pueden modificar rangos.",
             ephemeral: true
           });
         }
         const user = interaction.options.getUser("empleado");
         if (user.bot) {
-          return interaction.reply({ content: "⚠️ No podés modificar el rango de un bot.", ephemeral: true });
+          return await interaction.reply({ content: "⚠️ No podés modificar el rango de un bot.", ephemeral: true });
         }
         const nuevoRol = interaction.options.getRole("nuevo_rol");
         const emp = findOrCreateEmployee(db, user.id, user.username, user.globalName);
@@ -1861,7 +1871,7 @@ client.on("interactionCreate", async interaction => {
 
       if (commandName === "sancionar") {
         if (!canMemberReviewApplications(interaction.member)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "🚫 Solo **Rangos Altos**, **RRHH** e **Instructores** pueden aplicar sanciones.",
             ephemeral: true
           });
@@ -1881,7 +1891,7 @@ client.on("interactionCreate", async interaction => {
 
       if (commandName === "despedir") {
         if (!canMemberReviewApplications(interaction.member)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "🚫 Solo **Rangos Altos** y **RRHH** pueden dar de baja personal.",
             ephemeral: true
           });
@@ -2006,7 +2016,7 @@ client.on("interactionCreate", async interaction => {
     if (interaction.isStringSelectMenu()) {
       if (interaction.customId.startsWith("select_approve_role_")) {
         if (!canMemberReviewApplications(interaction.member)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "🚫 **Acceso denegado:** Solo **Rangos Altos**, **RRHH** e **Instructores** pueden seleccionar el rol de aprobación.",
             ephemeral: true
           });
@@ -2036,7 +2046,7 @@ client.on("interactionCreate", async interaction => {
       // 1. BOTONES DEL PANEL /CLOCK
       if (customId === "keep_duty_alive") {
         if (!emp.onDuty) {
-          return interaction.reply({ content: "⚠️ Tu turno ya estaba cerrado.", ephemeral: true });
+          return await interaction.reply({ content: "⚠️ Tu turno ya estaba cerrado.", ephemeral: true });
         }
         const elapsedMs = Date.now() - (emp.dutyStart || Date.now());
         const elapsedHours = Math.max(0.05, elapsedMs / (1000 * 60 * 60));
@@ -2046,7 +2056,7 @@ client.on("interactionCreate", async interaction => {
         emp.warnedAFK = false;
         addFeedEvent(db, "CLOCK", `${emp.name} confirmó actividad y renovó su turno activo`);
         writeDb(db);
-        return interaction.reply({
+        return await interaction.reply({
           content: `🟢 **Turno renovado.** Se acreditaron tus horas previas (**${emp.hours.toFixed(1)}h** acumuladas) y tu reloj sigue corriendo por otro bloque de hasta 5 horas.`,
           ephemeral: true
         });
@@ -2054,7 +2064,7 @@ client.on("interactionCreate", async interaction => {
 
       if (customId === "clock_in") {
         if (emp.onDuty) {
-          return interaction.reply({ content: "⚠️ Ya te encontrás **En Servicio** actualmente.", ephemeral: true });
+          return await interaction.reply({ content: "⚠️ Ya te encontrás **En Servicio** actualmente.", ephemeral: true });
         }
         emp.onDuty = true;
         emp.dutyStart = Date.now();
@@ -2062,7 +2072,7 @@ client.on("interactionCreate", async interaction => {
         writeDb(db);
         updateBotPresence();
         syncMemberDutyRole(interaction.user.id, true).catch(() => null);
-        return interaction.reply({
+        return await interaction.reply({
           content: `🟢 **Entrada registrada** para **${emp.name}**. Se te asignó el rol **En servicio** y tu tiempo está corriendo.`,
           ephemeral: true
         });
@@ -2070,7 +2080,7 @@ client.on("interactionCreate", async interaction => {
 
       if (customId === "clock_out") {
         if (!emp.onDuty) {
-          return interaction.reply({ content: "⚠️ No tenés ningún turno abierto en este momento.", ephemeral: true });
+          return await interaction.reply({ content: "⚠️ No tenés ningún turno abierto en este momento.", ephemeral: true });
         }
         const elapsedMs = Date.now() - (emp.dutyStart || Date.now());
         const elapsedHours = Math.max(0.05, elapsedMs / (1000 * 60 * 60));
@@ -2085,7 +2095,7 @@ client.on("interactionCreate", async interaction => {
         updateBotPresence();
         syncMemberDutyRole(interaction.user.id, false).catch(() => null);
 
-        return interaction.reply({
+        return await interaction.reply({
           content: `🔴 **Salida registrada.** Sumaste **${mins} minutos** en este turno.\n⏱️ Total acumulado en la semana: **${emp.hours.toFixed(1)}h**.`,
           ephemeral: true
         });
@@ -2102,14 +2112,14 @@ client.on("interactionCreate", async interaction => {
               .join("\n")
           : "*No hay agentes en servicio en este momento.*";
 
-        return interaction.reply({
+        return await interaction.reply({
           content: `**👮 Agentes Trabajando Actualmente (${active.length}):**\n${list}`,
           ephemeral: true
         });
       }
 
       if (customId === "clock_total") {
-        return interaction.reply({
+        return await interaction.reply({
           content: `⏱️ **Mi Tiempo Total (${emp.name}):**\n• Horas esta semana: **${emp.hours.toFixed(1)}h**\n• Horas históricas: **${(emp.totalHours || emp.hours).toFixed(1)}h**`,
           ephemeral: true
         });
@@ -2117,7 +2127,7 @@ client.on("interactionCreate", async interaction => {
 
       if (customId === "clock_stats") {
         const bonus = calculateEmployeeBonus(emp, db.rates);
-        return interaction.reply({
+        return await interaction.reply({
           content:
             `📊 **Estadísticas de ${emp.name} (${emp.rank}):**\n` +
             `• Horas semanales: **${emp.hours.toFixed(1)}h / 12.0h**\n` +
@@ -2133,7 +2143,7 @@ client.on("interactionCreate", async interaction => {
           .map((e, idx) => `${idx + 1}. **${e.name}** — ${e.hours.toFixed(1)}h ($${calculateEmployeeBonus(e, db.rates).toLocaleString("es-AR")})`)
           .join("\n");
 
-        return interaction.reply({
+        return await interaction.reply({
           content: `⚙️ **Panel de Administración — Resumen de Horas y Bonos:**\n${top || "Sin registros aún."}`,
           ephemeral: true
         });
@@ -2159,7 +2169,7 @@ client.on("interactionCreate", async interaction => {
         addFeedEvent(db, "BONO", `${emp.name} certificó ${title} (+$${rewardVal.toLocaleString("es-AR")})`);
         writeDb(db);
 
-        return interaction.reply({
+        return await interaction.reply({
           content: `✅ **${emp.name}** certificó la actividad **${title}** (+**$${rewardVal.toLocaleString("es-AR")}** sumados a tu bono semanal).`
         });
       }
@@ -2376,7 +2386,7 @@ client.on("interactionCreate", async interaction => {
         addFeedEvent(db, "TICKET", `Ticket #${channelName} abierto por ${interaction.user.username}`);
         writeDb(db);
 
-        return interaction.reply({
+        return await interaction.reply({
           content: `✅ Tu canal de atención fue creado: <#${ticketChannel.id}>`,
           ephemeral: true
         });
@@ -2436,7 +2446,7 @@ client.on("interactionCreate", async interaction => {
 
       if (customId.startsWith("ticket_approve_")) {
         if (!canMemberReviewApplications(interaction.member)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "🚫 **Acceso denegado:** Solo **Rangos Altos**, **RRHH** e **Instructores** tienen permiso para aprobar postulaciones.",
             ephemeral: true
           });
@@ -2479,7 +2489,7 @@ client.on("interactionCreate", async interaction => {
 
       if (customId.startsWith("ticket_reject_")) {
         if (!canMemberReviewApplications(interaction.member)) {
-          return interaction.reply({
+          return await interaction.reply({
             content: "🚫 **Acceso denegado:** Solo **Rangos Altos**, **RRHH** e **Instructores** tienen permiso para rechazar postulaciones.",
             ephemeral: true
           });
@@ -2572,7 +2582,7 @@ client.on("interactionCreate", async interaction => {
 
     if (interaction.isModalSubmit() && interaction.customId.startsWith("modal_approve_")) {
       if (!canMemberReviewApplications(interaction.member)) {
-        return interaction.reply({ content: "🚫 No tenés permisos para aprobar postulaciones.", ephemeral: true });
+        return await interaction.reply({ content: "🚫 No tenés permisos para aprobar postulaciones.", ephemeral: true });
       }
       const applicantId = interaction.customId.replace("modal_approve_", "");
       const nombreIc = interaction.fields.getTextInputValue("approve_name_ic");
@@ -2599,7 +2609,7 @@ client.on("interactionCreate", async interaction => {
 
     if (interaction.isModalSubmit() && interaction.customId.startsWith("modal_reject_")) {
       if (!canMemberReviewApplications(interaction.member)) {
-        return interaction.reply({ content: "🚫 No tenés permisos para rechazar postulaciones.", ephemeral: true });
+        return await interaction.reply({ content: "🚫 No tenés permisos para rechazar postulaciones.", ephemeral: true });
       }
       const applicantId = interaction.customId.replace("modal_reject_", "");
       const reason = interaction.fields.getTextInputValue("reject_reason");
@@ -2657,7 +2667,7 @@ client.on("interactionCreate", async interaction => {
         }
       }
 
-      return interaction.reply({
+      return await interaction.reply({
         content: `📝 Tu inasistencia fue registrada con el motivo: *"${reason}"*`,
         ephemeral: true
       });

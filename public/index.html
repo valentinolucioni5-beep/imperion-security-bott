@@ -1037,10 +1037,16 @@
     function applyLoggedUserUI() {
       const overlay = document.getElementById("login-overlay");
       if (!currentUser) {
-        overlay.classList.remove("hidden");
+        if (overlay) {
+          overlay.classList.remove("hidden");
+          overlay.style.display = "flex";
+        }
         return;
       }
-      overlay.classList.add("hidden");
+      if (overlay) {
+        overlay.classList.add("hidden");
+        overlay.style.display = "none";
+      }
       const label = `${currentUser.icName} (${currentUser.roleTitle})`;
       const badge = document.getElementById("logged-user-badge");
       if (badge) badge.textContent = `👤 ${label}`;
@@ -1054,7 +1060,12 @@
       const roleChoice = document.getElementById("login-role-choice").value;
       const securityCode = document.getElementById("login-security-code").value.trim();
       const errBox = document.getElementById("login-error");
+      const btn = e.target.querySelector('button[type="submit"]');
       errBox.classList.add("hidden");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "⏳ VERIFICANDO ACCESO...";
+      }
 
       try {
         const res = await fetch("/api/auth/login", {
@@ -1066,15 +1077,28 @@
         if (!data.ok) {
           errBox.textContent = data.error || "Código inválido.";
           errBox.classList.remove("hidden");
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = "🔓 INGRESAR AL PANEL DE CONTROL";
+          }
           return;
         }
         currentUser = data.user;
         localStorage.setItem("imperion_auth_user", JSON.stringify(currentUser));
         applyLoggedUserUI();
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "🔓 INGRESAR AL PANEL DE CONTROL";
+        }
+        fetchState();
         showToast(`Bienvenido/a ${currentUser.icName} • ${currentUser.roleTitle}`);
       } catch (err) {
-        errBox.textContent = "Error de conexión con el servidor.";
+        errBox.textContent = "Error de conexión con el servidor. Intentá nuevamente.";
         errBox.classList.remove("hidden");
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "🔓 INGRESAR AL PANEL DE CONTROL";
+        }
       }
     }
 
